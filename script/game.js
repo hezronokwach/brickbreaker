@@ -11,7 +11,13 @@ export default class Game{
     start(){
         this.ball = new Ball(this);
         this.paddle = new Paddle(this);
-        this.gameObjects = [this.ball, this.paddle];
+        let bricks = [];
+        for (let i = 0; i < 10; i++) {
+            bricks.push(new Brick(this, {x: 32 * i, y: 30}))            
+        }
+
+
+        this.gameObjects = [this.ball, this.paddle,...bricks];
         new InputHandler(this.paddle);
     }    
     update(deltaTime){
