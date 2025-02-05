@@ -1,23 +1,40 @@
-export default class Ball{
-    constructor(game){
+export default class Ball {
+    constructor(game) {
         this.image = document.getElementById('imageBall');
-        this.speed = {x:2, y:2};
-        this.position = {x:10, y:10};
+        this.speed = { x: 4, y: 2 };
+        this.position = { x: 10, y: 10 };
         this.size = 16;
-        this.gamewidth = game.gamewidth; 
+        this.gamewidth = game.gamewidth;
         this.gameheight = game.gameheight;
+        this.game = game;
     }
-    draw(ctx){
-        ctx.drawImage(this.image,this.position.x,this.position.y,this.size,this.size);
+    draw(ctx) {
+        ctx.drawImage(this.image, this.position.x, this.position.y, this.size, this.size);
     }
-    update(deltaTime){
+    update(deltaTime) {
         this.position.x += this.speed.x;
         this.position.y += this.speed.y;
-        if(this.position.x + this.size > this.gamewidth || this.position.x < 0){
+
+        //wall on the left or right side
+        if (this.position.x + this.size > this.gamewidth || this.position.x < 0) {
             this.speed.x = -this.speed.x;
         }
-        if(this.position.y + this.size > this.gameheight || this.position.y < 0){
+        //wall on the top or bottom side
+        if (this.position.y + this.size > this.gameheight || this.position.y < 0) {
             this.speed.y = -this.speed.y;
+        }
+
+        //paddle hit
+        let bottomBall = this.position.y + this.size
+        let topPaddle = this.game.paddle.position.y
+        let leftSidePaddle = this.game.paddle.position.x
+        let rightSidePaddle = this.game.paddle.position.x + this.game.paddle.width
+        if (bottomBall >= topPaddle 
+            && this.position.x >= leftSidePaddle
+            && this.position.x + this.size <= rightSidePaddle
+        ){
+            this.speed.y = -this.speed.y;
+            this.position.y = this.game.paddle.position.y - this.size
         }
     }
 }
