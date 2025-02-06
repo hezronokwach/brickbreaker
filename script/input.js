@@ -12,6 +12,10 @@ export default class InputHandler{
                    // alert('Game paused');
                     game.pause();
                     break;
+                case 32:
+                        // alert('Game paused');
+                         game.start();
+                         break;
             }
         });
         document.addEventListener('keyup', (event)=>{
