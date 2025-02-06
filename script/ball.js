@@ -2,12 +2,16 @@ import { detectCollision } from "./detectCollision.js";
 export default class Ball {
     constructor(game) {
         this.image = document.getElementById('imageBall');
-        this.speed = { x: 4, y: -2 };
-        this.position = { x: 10, y: 400 };
+        
         this.size = 16;
         this.gamewidth = game.gamewidth;
         this.gameheight = game.gameheight;
         this.game = game;
+        this.reset();
+    }
+    reset(){
+        this.speed = { x: 4, y: -2 };
+        this.position = { x: 10, y: 400 };
     }
     draw(ctx) {
         ctx.drawImage(this.image, this.position.x, this.position.y, this.size, this.size);
@@ -21,8 +25,13 @@ export default class Ball {
             this.speed.x = -this.speed.x;
         }
         //wall on the top or bottom side
-        if (this.position.y + this.size > this.gameheight || this.position.y < 0) {
+        if ( this.position.y < 0) {
             this.speed.y = -this.speed.y;
+        }
+
+        if (this.position.y + this.size > this.gameheight) {
+            this.game.lives--;
+            this.reset();
         }
 
         //paddle hit
