@@ -6,6 +6,7 @@ export default class Brick {
         this.width = 80;
         this.height = 24;
         this.game = game;
+        this.points = 10;
 
         this.delete = false;
     }
@@ -13,6 +14,7 @@ export default class Brick {
         if (detectCollision(this.game.ball, this)) {
             this.game.ball.speed.y = -this.game.ball.speed.y;
             this.delete = true;
+            this.game.addScore(this.points)
         }
     }
     draw(ctx) {
