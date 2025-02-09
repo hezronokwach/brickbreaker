@@ -9,7 +9,8 @@ export const GAMESTATE = {
     PLAY: 1,
     MENU: 2,
     OVER: 3,
-    NEWLEVEL: 4
+    NEWLEVEL: 4,
+    WIN: 5
 };
 
 export default class Game {
@@ -53,6 +54,7 @@ export default class Game {
 
     start() {
         if (this.gamestate !== GAMESTATE.MENU && this.gamestate !== GAMESTATE.NEWLEVEL) return;
+        if (this.gamestate !== GAMESTATE.MENU && this.gamestate !== GAMESTATE.NEWLEVEL) return;
 
         this.bricks = buildLevel(this, this.levels[this.currentLevel]);
         this.ball.reset();
@@ -68,6 +70,10 @@ export default class Game {
 
         if (this.bricks.length === 0) {
             this.currentLevel++;
+            if (this.currentLevel >= this.levels.length) {
+                this.gamestate = GAMESTATE.WIN;
+                return;
+            }
             this.gamestate = GAMESTATE.NEWLEVEL;
             this.start();
         }
