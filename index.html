@@ -5,22 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brick Breaker</title>
     <style>
-        canvas {
-            display: block;
-            background: white;
-            border : 1px solid black;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        img{
-            display: none;
-        }      
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+        
+        #gameContainer {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background: white;
+            border: 1px solid black;
+            overflow: hidden;
+        }
+    
+        .ball {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: red;
+            border-radius: 50%;
+        }
+        
+        .brick {
+            position: absolute;
+            width: 80px;
+            height: 24px;
+            background: #0095dd;
+        }
+        
+        .paddle {
+            position: absolute;
+            width: 150px;
+            height: 20px;
+            background: green;
+        }
     </style>
 </head>
 <body>
-    <img id = "imageBall" src = "/assets/ball3.png"  >
-    <img id = "imageBrick" src = "/assets/brick.jpg"  >
-
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <script type = "module" src="/script/index.js">        
-    </script>
+  <div id="gameContainer">
+    <div id="scoreboard">
+        <p>Time: <span id="timer">00:00</span></p>
+        <p>Score: <span id="score">0</span></p>
+        <p>Lives: <span id="lives">2</span></p>
+    </div>
+    <div id="pauseMenu">
+        <h1>PAUSED</h1>
+        <button id="continueButton">Continue</button>
+        <button id="restartButton">Restart</button>
+    </div>
+</div>
+    <script type="module" src="script/index.js"></script>
 </body>
 </html>
