@@ -1,19 +1,30 @@
-import Game from "./game.js"
-
-let canvas = document.getElementById('gameCanvas');
-let ctx = canvas.getContext('2d');
+import Game from "./game.js";
 
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 600;
-let game = new Game(GAME_WIDTH, GAME_HEIGHT);
-let lastTime = 0;
 
-function gameLoop(time){
-    let deltaTime = time - lastTime;
-    lastTime = time;
-    ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-    game.update(deltaTime);
-    game.draw(ctx);
-    requestAnimationFrame(gameLoop);
+function startGame() {
+    try {
+        console.log('Starting game initialization...');
+        const game = new Game(GAME_WIDTH, GAME_HEIGHT);
+        console.log('Game initialized');
+        
+        let lastTime = 0;
+        function gameLoop(time) {
+            let deltaTime = time - lastTime;
+            lastTime = time;
+            
+            game.update(deltaTime);
+            game.draw();
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        requestAnimationFrame(gameLoop);
+    } catch (error) {
+        console.error('Failed to start game:', error);
+    }
 }
-requestAnimationFrame(gameLoop);
+
+// Ensure DOM is loaded
+document.addEventListener('DOMContentLoaded', startGame);
