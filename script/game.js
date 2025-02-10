@@ -20,12 +20,12 @@ const overlayStyles = `
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    color: white;
+    color: #E63946;
     font-family: 'Press Start 2P', cursive;
     z-index: 1000;
-    background: rgba(0, 0, 0, 0.9);
+    background: #1D3557;
     padding: 20px;
-    border: 2px solid #666;
+    border: 2px solid #457B9D;
     border-radius: 10px;
 `;
 
@@ -34,9 +34,9 @@ const buttonStyles = `
     padding: 15px 30px;
     margin: 10px;
     cursor: pointer;
-    background: #333;
-    color: white;
-    border: 2px solid #666;
+    background: #A8DADC;
+    color: #1D3557;
+    border: 2px solid #457B9D;
     border-radius: 5px;
     transition: all 0.3s;
 `;
@@ -69,6 +69,8 @@ export default class Game {
         this.start();
 
         this.activeGameOverScreen = null; // Track active screen
+
+        this.initializeKeyboardControls();
     }
 
     initializeDOM() {
@@ -85,10 +87,14 @@ export default class Game {
     }
 
     start() {
-        // Remove duplicate condition
         if (this.gamestate !== GAMESTATE.MENU && 
             this.gamestate !== GAMESTATE.NEWLEVEL) return;
 
+        // Clear existing bricks
+        this.bricks.forEach(brick => {
+            if (brick.element) brick.element.remove();
+        });
+        
         // Reset/build level
         this.bricks = buildLevel(this, this.levels[this.currentLevel]);
         this.ball.reset();
@@ -217,6 +223,43 @@ export default class Game {
             this.activePauseScreen = null;
         }
 
+        if (this.gamestate === GAMESTATE.WIN) {
+            if (!this.activeWinScreen) {
+                const winScreen = document.createElement('div');
+                winScreen.className = 'win-screen';
+                winScreen.style.cssText = overlayStyles;
+                
+                const minutes = Math.floor(this.time / 60);
+                const seconds = Math.floor(this.time % 60);
+                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                winScreen.innerHTML = `
+                    <h1 style="font-size: 2em; margin-bottom: 20px;">CONGRATULATIONS!</h1>
+                    <p style="margin: 15px 0;">YOU HAVE WON!</p>
+                    <p style="margin: 15px 0;">Final Score: ${this.score}</p>
+                    <p style="margin: 15px 0;">Time: ${timeString}</p>
+                    <button id="restartButton" style="${buttonStyles}">
+                        PLAY AGAIN
+                    </button>
+                `;
+                
+                this.gameContainer.appendChild(winScreen);
+                this.activeWinScreen = winScreen;
+                
+                const restartButton = winScreen.querySelector('#restartButton');
+                restartButton.addEventListener('mouseover', () => {
+                    restartButton.style.background = '#555';
+                });
+                restartButton.addEventListener('mouseout', () => {
+                    restartButton.style.background = '#333';
+                });
+                restartButton.onclick = () => this.restart();
+            }
+        } else if (this.activeWinScreen) {
+            this.activeWinScreen.remove();
+            this.activeWinScreen = null;
+        }
+
     }
 
     updateScoreboard() {
@@ -244,17 +287,72 @@ export default class Game {
         this.updateScoreboard();
     }
 
+    clearGameObjects() {
+        // Remove all existing bricks
+        this.bricks.forEach(brick => {
+            if (brick.element) brick.element.remove();
+        });
+        this.bricks = [];
+
+        // Remove existing ball and paddle
+        if (this.ball && this.ball.element) this.ball.element.remove();
+        if (this.paddle && this.paddle.element) this.paddle.element.remove();
+        
+        // Clear game objects array
+        this.gameObjects = [];
+    }
+
     restart() {
         if (this.activeGameOverScreen) {
             this.activeGameOverScreen.remove();
             this.activeGameOverScreen = null;
         }
+        
+        // Clear all game objects
+        this.clearGameObjects();
+        
+        // Create new paddle and ball
+        this.paddle = new Paddle(this);
+        this.ball = new Ball(this);
+        new InputHandler(this.paddle, this);
+
+        
+        // Reset game state
         this.lives = 2;
         this.score = 0;
         this.time = 0;
         this.currentLevel = 0;
         this.gamestate = GAMESTATE.MENU;
+        
+        // Start new game
         this.start();
         this.updateScoreboard();
+
+        this.initializeKeyboardControls();
+    }
+
+    initializeKeyboardControls() {
+        // Remove existing listener if any
+        if (this.escKeyHandler) {
+            document.removeEventListener('keydown', this.escKeyHandler);
+        }
+        
+        // Create new handler
+        this.escKeyHandler = (event) => {
+            if (event.key === "Escape") {
+                if (this.gamestate === GAMESTATE.PLAY) {
+                    this.gamestate = GAMESTATE.PAUSE;
+                } else if (this.gamestate === GAMESTATE.PAUSE) {
+                    this.gamestate = GAMESTATE.PLAY;
+                    if (this.activePauseScreen) {
+                        this.activePauseScreen.remove();
+                        this.activePauseScreen = null;
+                    }
+                }
+            }
+        };
+        
+        // Add new listener
+        document.addEventListener('keydown', this.escKeyHandler);
     }
 }
