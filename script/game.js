@@ -120,4 +120,9 @@ export default class Game {
             this.gamestate = GAMESTATE.PAUSE;
         }
     }
+
+    addScore(points) {
+        this.score += points;
+        this.updateScoreboard();
+    }
 }
