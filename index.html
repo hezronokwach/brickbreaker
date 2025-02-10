@@ -5,67 +5,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brick Breaker</title>
+    <!-- Add Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Press Start 2P', cursive;
         }
         
         body {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            background: #f0f0f0;
+            background: linear-gradient(to bottom, #1a1a1a, #4a4a4a);
+            padding: 20px;
+        }
+
+        #statsContainer {
+            width: 800px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #666;
+            border-radius: 10px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+            font-size: 14px;
+            text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
         }
         
         #gameContainer {
             position: relative;
             width: 800px;
             height: 600px;
-            background: white;
-            border: 1px solid black;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #666;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             overflow: hidden;
         }
-    
+
+        /* Remove old scoreboard styles */
+        #scoreboard {
+            display: none;
+        }
+        
         .ball {
             position: absolute;
             width: 16px;
             height: 16px;
-            background: red;
+            background: #fff;
             border-radius: 50%;
+            box-shadow: 0 0 10px #fff;
         }
         
         .brick {
             position: absolute;
             width: 80px;
             height: 24px;
-            background: #0095dd;
+            background: linear-gradient(to bottom, #ff3366, #ff0033);
+            border-radius: 3px;
+            box-shadow: 0 0 5px rgba(255, 51, 102, 0.5);
         }
         
         .paddle {
             position: absolute;
             width: 150px;
             height: 20px;
-            background: green;
+            background: linear-gradient(to bottom, #33ccff, #0099cc);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(51, 204, 255, 0.5);
         }
     </style>
 </head>
 
 <body>
-  <div id="gameContainer">
-    <div id="scoreboard">
-        <p>Time: <span id="timer">00:00</span></p>
-        <p>Score: <span id="score">0</span></p>
-        <p>Lives: <span id="lives">2</span></p>
+    <div id="statsContainer">
+        <div class="stat-item">TIME<br><span id="timer">00:00</span></div>
+        <div class="stat-item">LIVES<br><span id="lives">2</span></div>
+        <div class="stat-item">SCORE<br><span id="score">0</span></div>
     </div>
-    <div id="pauseMenu">
-        <h1>PAUSED</h1>
-        <button id="continueButton">Continue</button>
-        <button id="restartButton">Restart</button>
+    <div id="gameContainer">
     </div>
-</div>
     <script type="module" src="script/index.js"></script>
 </body>
 
