@@ -2,7 +2,7 @@ import Paddle from './paddle.js';
 import InputHandler from './input.js';
 import Ball from './ball.js';
 import Brick from './brick.js';
-import { level1, buildLevel, level2 } from './levels.js';
+import { level1, buildLevel, level2, level3, level4, level5 } from './levels.js';
 
 export const GAMESTATE = {
     PAUSE: 0,
@@ -51,7 +51,7 @@ export default class Game {
         this.lives = 2;
         this.score = 0;
         this.time = 0;
-        this.levels = [level1, level2];
+        this.levels = [level1, level2,level3,level4,level5];
         this.currentLevel = 0;
 
         // Get DOM elements
@@ -110,6 +110,9 @@ export default class Game {
     }
 
     update(deltaTime) {
+        if (deltaTime < 1000/60) return;
+
+
         if (this.lives === 0) this.gamestate = GAMESTATE.OVER;
 
         if (this.gamestate === GAMESTATE.PAUSE || this.gamestate === GAMESTATE.MENU || this.gamestate === GAMESTATE.OVER) return;
@@ -139,6 +142,7 @@ export default class Game {
         this.gameObjects.forEach(object => object.draw());
         this.bricks.forEach(brick => brick.draw());
 
+        
         // Handle game over screen
         if (this.gamestate === GAMESTATE.OVER) {
             if (!this.activeGameOverScreen) {
