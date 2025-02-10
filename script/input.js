@@ -1,3 +1,4 @@
+
 export default class InputHandler{
     constructor(paddle,game){
         document.addEventListener('keydown', (event)=>{
@@ -10,9 +11,9 @@ export default class InputHandler{
                     break;
                
                 case 32:
-                        // alert('Game paused');
-                         game.start();
-                         break;
+                        game.start();
+                
+                    break;
             }
         });
         document.addEventListener('keyup', (event)=>{

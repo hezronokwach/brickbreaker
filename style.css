@@ -48,7 +48,6 @@ body {
     background: var(--game-bg);
     border: 2px solid var(--border-color);
     border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     overflow: hidden;
 }
 
@@ -63,7 +62,6 @@ body {
     height: 16px;
     background: var(--text-color);
     border-radius: 50%;
-    box-shadow: 0 0 5px var(--text-color);
 }
 
 .brick {
@@ -73,7 +71,6 @@ body {
     background: var(--brick-color);
     border: 2px solid var(--border-color);
     border-radius: 3px;
-    box-shadow: 0 0 5px var(--brick-color);
 }
 
 .paddle {
@@ -83,5 +80,4 @@ body {
     background: var(--paddle-color);
     border: 2px solid var(--border-color);
     border-radius: 10px;
-    box-shadow: 0 0 5px var(--paddle-color);
 }
