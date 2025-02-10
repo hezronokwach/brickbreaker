@@ -7,6 +7,7 @@ export default class Brick {
         this.width = 80;
         this.height = 24;
         this.delete = false;
+        this.points = 10;
         this.element = document.createElement('div');
         this.element.className = 'brick';
         this.element.style.width = `${this.width}px`;
@@ -24,6 +25,7 @@ export default class Brick {
             this.game.ball.speed.y = -this.game.ball.speed.y;
             this.delete = true;
             this.element.remove();
+            this.game.addScore(this.points);
         }
     }
 }
