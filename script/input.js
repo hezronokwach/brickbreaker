@@ -8,10 +8,7 @@ export default class InputHandler{
                 case 39:
                     paddle.moveRight();
                     break;
-                case 27:
-                   // alert('Game paused');
-                    game.pause();
-                    break;
+               
                 case 32:
                         // alert('Game paused');
                          game.start();
