@@ -113,6 +113,9 @@ export default class Game {
     }
 
     update(deltaTime) {
+        if (deltaTime < 1000/60) return;
+
+
         if (this.lives === 0) this.gamestate = GAMESTATE.OVER;
 
         if (this.gamestate === GAMESTATE.PAUSE || this.gamestate === GAMESTATE.MENU || this.gamestate === GAMESTATE.OVER) return;
@@ -160,6 +163,7 @@ export default class Game {
         this.gameObjects.forEach(object => object.draw());
         this.bricks.forEach(brick => brick.draw());
 
+        
         // Handle game over screen
         if (this.gamestate === GAMESTATE.OVER) {
             if (!this.activeGameOverScreen) {
