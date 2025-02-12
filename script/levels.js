@@ -1,8 +1,24 @@
-import Brick  from "./brick.js";
+import Brick from "./brick.js";
 
 export const level1 = [
-    [0, 1, 'M', 1, 0, 0, 'E', 1, 1, 0], // M = multiball, E = extra life
-    [1, 1, 'M', 1, 1, 1, 1, 'E', 1, 1],
+    // Level 1 - Introduction to power-ups
+    [0, 1, 0, 'M', 1, 1, 0, 'E', 1, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 1, 1, 'E', 1, 1, 1, 0, 1],
+    [1, 1, 1, 0, 1, 1, 0, 1, 1, 1],
+    ['M', 1, 1, 1, 1, 1, 1, 1, 1, 'E'],
+    [0, 1, 0, 1, 0, 0, 1, 0, 1, 0],
+];
+
+export const level2 = [
+    // Level 2 - More challenging pattern
+    [1, 1, 1, 1, 'M', 'M', 1, 1, 1, 1],
+    [1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+    ['E', 1, 0, 1, 'M', 'M', 1, 0, 1, 'E'],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 'M', 1, 1, 'E', 'E', 1, 1, 'M', 0],
+    [1, 0, 1, 0, 1, 1, 0, 1, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
 export function buildLevel(game, level) {
@@ -23,4 +39,3 @@ export function buildLevel(game, level) {
     });
     return bricks;
 }
-
