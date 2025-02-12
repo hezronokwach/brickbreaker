@@ -2,7 +2,7 @@ import Paddle from './paddle.js';
 import InputHandler from './input.js';
 import Ball from './ball.js';
 import Brick from './brick.js';
-import { level1, buildLevel } from './levels.js';
+import { level1, buildLevel,level2 } from './levels.js';
 
 export const GAMESTATE = {
     PAUSE: 0,
@@ -51,7 +51,7 @@ export default class Game {
         this.lives = 2;
         this.score = 0;
         this.time = 0;
-        this.levels = [level1];
+        this.levels = [level1, level2]; // Add level2 to levels array
         this.currentLevel = 0;
 
         // Get DOM elements
@@ -147,6 +147,7 @@ export default class Game {
             if (this.currentLevel >= this.levels.length) {
                 this.gamestate = GAMESTATE.WIN;
             } else {
+                // Show level transition
                 this.gamestate = GAMESTATE.NEWLEVEL;
                 this.start();
             }
@@ -411,5 +412,19 @@ export default class Game {
         
         // Add new listener
         document.addEventListener('keydown', this.escKeyHandler);
+    }
+
+    showLevelTransition() {
+        const levelScreen = document.createElement('div');
+        levelScreen.className = 'level-screen';
+        levelScreen.style.cssText = overlayStyles;
+        
+        levelScreen.innerHTML = `
+            <h1 style="font-size: 2em; margin-bottom: 20px;">LEVEL ${this.currentLevel + 1}</h1>
+            <p style="margin: 15px 0;">Get Ready!</p>
+        `;
+        
+        this.gameContainer.appendChild(levelScreen);
+        setTimeout(() => levelScreen.remove(), 2000);
     }
 }
