@@ -2,7 +2,7 @@ import Paddle from './paddle.js';
 import InputHandler from './input.js';
 import Ball from './ball.js';
 import Brick from './brick.js';
-import { level1, buildLevel, level2 } from './levels.js';
+import { level1, buildLevel } from './levels.js';
 
 export const GAMESTATE = {
     PAUSE: 0,
@@ -51,7 +51,7 @@ export default class Game {
         this.lives = 2;
         this.score = 0;
         this.time = 0;
-        this.levels = [level1, level2];
+        this.levels = [level1];
         this.currentLevel = 0;
 
         // Get DOM elements
@@ -71,6 +71,9 @@ export default class Game {
         this.activeGameOverScreen = null; // Track active screen
 
         this.initializeKeyboardControls();
+
+        this.balls = [this.ball]; // Store all active balls
+        this.powerUps = []; // Store active power-ups
     }
 
     initializeDOM() {
@@ -130,6 +133,24 @@ export default class Game {
         // Update timer
         this.time += deltaTime / 1000;
         this.updateScoreboard();
+
+        // Update all balls
+        this.balls = this.balls.filter(ball => {
+            ball.update(deltaTime);
+            return ball.position.y + ball.size < this.gameheight;
+        });
+
+        // If all balls are lost, lose a life
+        if (this.balls.length === 0) {
+            this.lives--;
+            if (this.lives > 0) {
+                this.ball = new Ball(this);
+                this.balls = [this.ball];
+            }
+        }
+
+        // Update power-ups
+        this.powerUps = this.powerUps.filter(powerUp => !powerUp.update());
     }
 
     draw() {
@@ -260,6 +281,8 @@ export default class Game {
             this.activeWinScreen = null;
         }
 
+        this.balls.forEach(ball => ball.draw());
+        this.powerUps.forEach(powerUp => powerUp.draw());
     }
 
     updateScoreboard() {

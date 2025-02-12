@@ -85,3 +85,27 @@ body {
     border-radius: 10px;
     box-shadow: 0 0 5px var(--paddle-color);
 }
+
+.power-up {
+    position: absolute;
+    border-radius: 50%;
+    z-index: 100;
+}
+
+.power-up-multiball {
+    background: linear-gradient(45deg, #ff0000, #ff6600);
+    box-shadow: 0 0 10px #ff0000;
+}
+
+.power-up-extralife {
+    background: linear-gradient(45deg, #00ff00, #66ff00);
+    box-shadow: 0 0 10px #00ff00;
+}
+
+.brick-multiball {
+    background: linear-gradient(45deg, #ff0000, #ff6600);
+}
+
+.brick-extralife {
+    background: linear-gradient(45deg, #00ff00, #66ff00);
+}
