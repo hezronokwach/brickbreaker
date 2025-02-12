@@ -7,18 +7,11 @@ export default class Ball {
         this.element.style.width = `${this.size}px`;
         this.element.style.height = `${this.size}px`;
         this.game.gameContainer.appendChild(this.element);
-        // Adjust base speed for smoother movement
-        this.baseSpeed = { x: 0.35, y: -0.15 }; 
         this.reset();
     }
 
     reset() {
-        const speedMultiplier = 1 + (this.game.currentLevel * 0.2);
-        this.speed = {
-            x: this.baseSpeed.x * speedMultiplier,
-            y: this.baseSpeed.y * speedMultiplier
-        };
-        
+        this.speed = { x: 6, y: -4 }; // Adjusted speed
         this.position = {
             x: this.game.gamewidth / 2 - this.size / 2,
             y: this.game.gameheight - 100
@@ -32,30 +25,36 @@ export default class Ball {
     }
 
     update(deltaTime) {
-        // Apply deltaTime to movement for consistent speed
-        this.position.x += this.speed.x * deltaTime;
-        this.position.y += this.speed.y * deltaTime;
+        const speedX = this.speed.x * (deltaTime / 16.67);
+        const speedY = this.speed.y * (deltaTime / 16.67);
+
+        this.position.x += speedX;
+        this.position.y += speedY;
 
         // Wall collisions
-        if (this.position.x < 0 || this.position.x + this.size > this.game.gamewidth) {
+        if (this.position.x + this.size > this.game.gamewidth || this.position.x < 0) {
             this.speed.x = -this.speed.x;
+            this.position.x = Math.max(0, Math.min(this.position.x, this.game.gamewidth - this.size));
         }
+        
         if (this.position.y < 0) {
             this.speed.y = -this.speed.y;
-        }
-
-        // Bottom collision
-        if (this.position.y + this.size > this.game.gameheight) {
-            this.game.lives--;
-            this.reset();
+            this.position.y = 0;
         }
 
         // Paddle collision
         if (this.game.paddle.collidesWith(this)) {
-            this.speed.y = -this.speed.y;
-            this.position.y = this.game.paddle.position.y - this.size;
+            this.speed.y = -Math.abs(this.speed.y); // Ensure upward movement
+            this.position.y = this.game.paddle.position.y - this.size; // Prevent sticking
+        }
+
+        // Bottom wall collision - remove ball
+        if (this.position.y + this.size > this.game.gameheight) {
+            this.element.remove(); // Remove DOM element
+            return false; // Signal ball should be removed
         }
 
         this.draw();
+        return true;
     }
 }

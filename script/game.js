@@ -113,47 +113,57 @@ export default class Game {
     }
 
     update(deltaTime) {
-        if (deltaTime < 1000/60) return;
+        if (this.gamestate !== GAMESTATE.PLAY) return;
 
-
-        if (this.lives === 0) this.gamestate = GAMESTATE.OVER;
-
-        if (this.gamestate === GAMESTATE.PAUSE || this.gamestate === GAMESTATE.MENU || this.gamestate === GAMESTATE.OVER) return;
-
-        if (this.bricks.length === 0) {
-            this.currentLevel++;
-            if (this.currentLevel >= this.levels.length) {
-                this.gamestate = GAMESTATE.WIN;
-                return;
+        // Update paddle
+        this.paddle.update(deltaTime);
+        
+        // Update and filter balls
+        let ballsToRemove = [];
+        this.balls.forEach(ball => {
+            if (!ball.update(deltaTime)) {
+                ballsToRemove.push(ball);
             }
-            this.gamestate = GAMESTATE.NEWLEVEL;
-            this.start();
-        }
-
-        [...this.gameObjects, ...this.bricks].forEach(object => object.update(deltaTime));
-        this.bricks = this.bricks.filter(brick => !brick.delete);
-
-        // Update timer
-        this.time += deltaTime / 1000;
-        this.updateScoreboard();
-
-        // Update all balls
-        this.balls = this.balls.filter(ball => {
-            ball.update(deltaTime);
-            return ball.position.y + ball.size < this.gameheight;
         });
 
-        // If all balls are lost, lose a life
+        // Remove lost balls
+        this.balls = this.balls.filter(ball => !ballsToRemove.includes(ball));
+
+        // Check if all balls are lost
         if (this.balls.length === 0) {
             this.lives--;
-            if (this.lives > 0) {
+            if (this.lives <= 0) {
+                this.gamestate = GAMESTATE.OVER;
+            } else {
+                // Create new ball only if player still has lives
                 this.ball = new Ball(this);
                 this.balls = [this.ball];
             }
         }
 
-        // Update power-ups
-        this.powerUps = this.powerUps.filter(powerUp => !powerUp.update());
+        // Check for level completion
+        if (this.bricks.length === 0) {
+            this.currentLevel++;
+            if (this.currentLevel >= this.levels.length) {
+                this.gamestate = GAMESTATE.WIN;
+            } else {
+                this.gamestate = GAMESTATE.NEWLEVEL;
+                this.start();
+            }
+        }
+
+        // Update bricks and powerups
+        this.bricks.forEach(brick => brick.update(deltaTime));
+        this.bricks = this.bricks.filter(brick => !brick.delete);
+
+        this.powerUps = this.powerUps.filter(powerUp => {
+            powerUp.update(deltaTime);
+            return !powerUp.delete;
+        });
+
+        // Update timer and scoreboard
+        this.time += deltaTime / 1000;
+        this.updateScoreboard();
     }
 
     draw() {
@@ -315,17 +325,29 @@ export default class Game {
     }
 
     clearGameObjects() {
-        // Remove all existing bricks
+        // Remove all balls
+        this.balls.forEach(ball => {
+            if (ball.element) ball.element.remove();
+        });
+        this.balls = [];
+
+        // Remove all bricks
         this.bricks.forEach(brick => {
             if (brick.element) brick.element.remove();
         });
         this.bricks = [];
 
-        // Remove existing ball and paddle
-        if (this.ball && this.ball.element) this.ball.element.remove();
-        if (this.paddle && this.paddle.element) this.paddle.element.remove();
-        
-        // Clear game objects array
+        // Remove all power-ups
+        this.powerUps.forEach(powerUp => {
+            if (powerUp.element) powerUp.element.remove();
+        });
+        this.powerUps = [];
+
+        // Remove paddle
+        if (this.paddle && this.paddle.element) {
+            this.paddle.element.remove();
+        }
+
         this.gameObjects = [];
     }
 
@@ -338,18 +360,17 @@ export default class Game {
         // Clear all game objects
         this.clearGameObjects();
         
-        // Create new paddle and ball
-        this.paddle = new Paddle(this);
-        this.ball = new Ball(this);
-        new InputHandler(this.paddle, this);
-
-        
         // Reset game state
         this.lives = 2;
         this.score = 0;
         this.time = 0;
         this.currentLevel = 0;
         this.gamestate = GAMESTATE.MENU;
+        
+        // Create new paddle and ball
+        this.paddle = new Paddle(this);
+        this.ball = new Ball(this);
+        this.balls = [this.ball];
         
         // Start new game
         this.start();
