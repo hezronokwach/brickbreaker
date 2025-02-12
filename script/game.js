@@ -65,7 +65,7 @@ export default class Game {
         this.paddle = new Paddle(this);
         this.ball = new Ball(this);
         
-        new InputHandler(this.paddle, this);
+        this.inputHandler = new InputHandler(this.paddle, this);
         this.start();
 
         this.activeGameOverScreen = null; // Track active screen
@@ -349,6 +349,12 @@ export default class Game {
         }
 
         this.gameObjects = [];
+
+        
+        // Destroy input handler
+        if (this.inputHandler) {
+            this.inputHandler.destroy();
+        }
     }
 
     restart() {
@@ -357,7 +363,7 @@ export default class Game {
             this.activeGameOverScreen = null;
         }
         
-        // Clear all game objects
+        // Clear all game objects and input handlers
         this.clearGameObjects();
         
         // Reset game state
@@ -371,6 +377,9 @@ export default class Game {
         this.paddle = new Paddle(this);
         this.ball = new Ball(this);
         this.balls = [this.ball];
+        
+        // Create new input handler
+        this.inputHandler = new InputHandler(this.paddle, this);
         
         // Start new game
         this.start();
