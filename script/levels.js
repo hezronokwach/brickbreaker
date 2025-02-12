@@ -2,7 +2,7 @@ import Brick  from "./brick.js";
 
 export const level1 = [
     [0, 1, 'M', 1, 0, 0, 'E', 1, 1, 0], // M = multiball, E = extra life
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 'M', 1, 1, 1, 1, 'E', 1, 1],
 ];
 
 export function buildLevel(game, level) {

@@ -42,11 +42,18 @@ export default class Paddle {
     }
 
     collidesWith(ball) {
+        let paddleTopY = this.position.y;
+        let paddleLeftX = this.position.x;
+        let paddleRightX = this.position.x + this.width;
+        let ballBottomY = ball.position.y + ball.size;
+        let ballLeftX = ball.position.x;
+        let ballRightX = ball.position.x + ball.size;
+
         return (
-            ball.position.x + ball.size > this.position.x &&
-            ball.position.x < this.position.x + this.width &&
-            ball.position.y + ball.size > this.position.y &&
-            ball.position.y < this.position.y + this.height
+            ballBottomY >= paddleTopY &&
+            ballBottomY <= paddleTopY + this.height &&
+            ballRightX >= paddleLeftX &&
+            ballLeftX <= paddleRightX
         );
     }
 }
