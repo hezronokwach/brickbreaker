@@ -129,6 +129,9 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: auto;
+    will-change: opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 .pause-screen button {
@@ -219,4 +222,10 @@ body {
     background: #457B9D;
     color: #F1FAEE;
     transform: scale(1.05);
+}
+
+.game-object {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
