@@ -53,7 +53,7 @@ export default class Game {
         this.lives = 2;
         this.score = 0;
         this.time = 0;
-        this.levels = [level1]; // Add level2 to levels array
+        this.levels = [level1, level2]; // Add level2 to levels array
         this.currentLevel = 0;
 
         // Get DOM elements
@@ -149,9 +149,15 @@ export default class Game {
             if (this.currentLevel >= this.levels.length) {
                 this.gamestate = GAMESTATE.WIN;
             } else {
-                // Show level transition
                 this.gamestate = GAMESTATE.NEWLEVEL;
-                this.start();
+                // Show level transition screen
+                this.showLevelTransition();
+                // Start next level after a delay
+                setTimeout(() => {
+                    if (this.gamestate === GAMESTATE.NEWLEVEL) {
+                        this.start();
+                    }
+                }, 1000);
             }
         }
 
@@ -287,11 +293,11 @@ export default class Game {
                 const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                 
                 winScreen.innerHTML = `
-                    <h1 style="font-size: 2em; margin-bottom: 20px;">CONGRATULATIONS!</h1>
-                    <p style="margin: 15px 0;">YOU HAVE WON!</p>
-                    <p style="margin: 15px 0;">Final Score: ${this.score}</p>
-                    <p style="margin: 15px 0;">Time: ${timeString}</p>
-                    <button id="restartButton" style="${buttonStyles}">
+                    <h1 style="font-size: 2em; margin-bottom: 20px; color: #66FF66;">YOU WIN!</h1>
+                    <p style="margin: 15px 0; color: #F1FAEE;">Congratulations!</p>
+                    <p style="margin: 15px 0; color: #F1FAEE;">Final Score: ${this.score}</p>
+                    <p style="margin: 15px 0; color: #F1FAEE;">Time: ${timeString}</p>
+                    <button id="winRestartButton" style="${buttonStyles}">
                         PLAY AGAIN
                     </button>
                 `;
@@ -299,14 +305,29 @@ export default class Game {
                 this.gameContainer.appendChild(winScreen);
                 this.activeWinScreen = winScreen;
                 
-                const restartButton = winScreen.querySelector('#restartButton');
+                // Add button hover effects
+                const restartButton = winScreen.querySelector('#winRestartButton');
                 restartButton.addEventListener('mouseover', () => {
-                    restartButton.style.background = '#555';
+                    restartButton.style.background = '#457B9D';
+                    restartButton.style.color = '#F1FAEE';
+                    restartButton.style.transform = 'scale(1.05)';
                 });
                 restartButton.addEventListener('mouseout', () => {
-                    restartButton.style.background = '#333';
+                    restartButton.style.background = '#A8DADC';
+                    restartButton.style.color = '#1D3557';
+                    restartButton.style.transform = 'scale(1)';
                 });
-                restartButton.onclick = () => this.restart();
+                
+                // Show screen with fade in
+                requestAnimationFrame(() => {
+                    winScreen.style.opacity = '1';
+                });
+                
+                restartButton.onclick = () => {
+                    this.restart();
+                    winScreen.remove();
+                    this.activeWinScreen = null;
+                };
             }
         } else if (this.activeWinScreen) {
             this.activeWinScreen.remove();
