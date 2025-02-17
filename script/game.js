@@ -7,7 +7,7 @@ import { level1, buildLevel,level2 } from './levels.js';
 export const GAMESTATE = {
     PAUSE: 0,
     PLAY: 1,
-    MENU: 2,
+    MENU: 2, // start menu
     OVER: 3,
     NEWLEVEL: 4,
     WIN: 5
@@ -53,7 +53,7 @@ export default class Game {
         this.lives = 2;
         this.score = 0;
         this.time = 0;
-        this.levels = [level1, level2]; // Add level2 to levels array
+        this.levels = [level1]; // Add level2 to levels array
         this.currentLevel = 0;
 
         // Get DOM elements
@@ -185,30 +185,45 @@ export default class Game {
                 gameOverScreen.style.cssText = overlayStyles;
                 
                 gameOverScreen.innerHTML = `
-                    <h1 style="font-size: 2em; margin-bottom: 20px;">GAME OVER</h1>
-                    <p style="margin: 15px 0;">Final Score: ${this.score}</p>
+                    <h1 style="font-size: 2em; margin-bottom: 20px; color: #E63946;">GAME OVER</h1>
+                    <p style="margin: 15px 0; color: #F1FAEE;">Final Score: ${this.score}</p>
+                    <p style="margin: 15px 0; color: #F1FAEE;">Time: ${Math.floor(this.time)}s</p>
                     <button id="restartButton" style="${buttonStyles}">
-                        RESTART GAME
+                        PLAY AGAIN
                     </button>
                 `;
                 
                 this.gameContainer.appendChild(gameOverScreen);
                 this.activeGameOverScreen = gameOverScreen;
                 
+                // Add button hover effects
                 const restartButton = gameOverScreen.querySelector('#restartButton');
                 restartButton.addEventListener('mouseover', () => {
-                    restartButton.style.background = '#555';
+                    restartButton.style.background = '#457B9D';
+                    restartButton.style.color = '#F1FAEE';
+                    restartButton.style.transform = 'scale(1.05)';
                 });
                 restartButton.addEventListener('mouseout', () => {
-                    restartButton.style.background = '#333';
+                    restartButton.style.background = '#A8DADC';
+                    restartButton.style.color = '#1D3557';
+                    restartButton.style.transform = 'scale(1)';
                 });
-                restartButton.onclick = () => this.restart();
+                
+                // Show screen with fade in
+                requestAnimationFrame(() => {
+                    gameOverScreen.style.opacity = '1';
+                });
+                
+                restartButton.onclick = () => {
+                    this.restart();
+                    gameOverScreen.remove();
+                    this.activeGameOverScreen = null;
+                };
             }
         } else {
             if (this.activeGameOverScreen) {
                 this.activeGameOverScreen.remove();
                 this.activeGameOverScreen = null;
-                this.gameContainer.style.background = 'white';
             }
         }
 
