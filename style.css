@@ -106,3 +106,9 @@ body {
 .brick-extralife {
     background: linear-gradient(45deg, #00ff00, #66ff00);
 }
+
+.ball, .paddle, .brick, .power-up {
+    position: absolute;
+    will-change: transform;
+    transform: translateZ(0);
+}

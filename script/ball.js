@@ -20,8 +20,8 @@ export default class Ball {
     }
 
     draw() {
-        this.element.style.left = `${this.position.x}px`;
-        this.element.style.top = `${this.position.y}px`;
+        // Replace direct style assignments with transform
+        this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
     }
 
     update(deltaTime) {
