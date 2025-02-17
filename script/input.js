@@ -1,3 +1,4 @@
+import { GAMESTATE } from "./game.js";
 export default class InputHandler {
     constructor(paddle, game) {
         this.paddle = paddle;
@@ -21,16 +22,25 @@ export default class InputHandler {
     }
 
     handleKeyDown(event) {
-        switch(event.keyCode) {
-            case 37:
-                this.paddle.moveLeft();
-                break;
-            case 39:
-                this.paddle.moveRight();
-                break;
-            case 32:
+        if (this.game.gamestate === GAMESTATE.PLAY) {
+            switch(event.keyCode) {
+                case 37: // Left arrow
+                    event.preventDefault();
+                    this.paddle.moveLeft();
+                    break;
+                case 39: // Right arrow
+                    event.preventDefault();
+                    this.paddle.moveRight();
+                    break;
+            }
+        }
+        
+        if (event.keyCode === 32) { // Space bar
+            event.preventDefault();
+            if (this.game.gamestate === GAMESTATE.MENU || 
+                this.game.gamestate === GAMESTATE.NEWLEVEL) {
                 this.game.start();
-                break;
+            }
         }
     }
 
