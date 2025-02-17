@@ -315,58 +315,82 @@ export default class Game {
     }
 
     pause() {
-        if (this.gamestate === GAMESTATE.PAUSE) {
-            this.gamestate = GAMESTATE.PLAY;
-        } else {
+        if (this.gamestate === GAMESTATE.PLAY) {
             this.gamestate = GAMESTATE.PAUSE;
+            this.createPauseScreen();
+        } else if (this.gamestate === GAMESTATE.PAUSE) {
+            this.gamestate = GAMESTATE.PLAY;
+            if (this.activePauseScreen) {
+                this.hideOverlay(this.activePauseScreen);
+                this.activePauseScreen = null;
+            }
         }
     }
 
+    createPauseScreen() {
+        if (this.activePauseScreen) return;
+        
+        const pauseScreen = document.createElement('div');
+        pauseScreen.className = 'pause-screen';
+        pauseScreen.style.cssText = overlayStyles;
+        
+        pauseScreen.innerHTML = `
+            <h1 style="font-size: 2em; margin-bottom: 20px;">PAUSED</h1>
+            <p style="margin: 15px 0;">Score: ${this.score}</p>
+            <button id="pauseContinueButton" style="${buttonStyles}">CONTINUE</button>
+            <button id="pauseRestartButton" style="${buttonStyles}">RESTART</button>
+        `;
+        
+        this.gameContainer.appendChild(pauseScreen);
+        this.activePauseScreen = pauseScreen;
+    
+        // Add event listeners
+        pauseScreen.querySelector('#pauseContinueButton').onclick = () => {
+            this.gamestate = GAMESTATE.PLAY;
+            this.hideOverlay(this.activePauseScreen);
+            this.activePauseScreen = null;
+        };
+        
+        pauseScreen.querySelector('#pauseRestartButton').onclick = () => {
+            this.restart();
+        };
+    
+        requestAnimationFrame(() => {
+            pauseScreen.style.opacity = '1';
+        });
+    }
+    
     addScore(points) {
         this.score += points;
         this.updateScoreboard();
     }
 
     clearGameObjects() {
-        // Remove all balls
-        this.balls.forEach(ball => {
-            if (ball.element) ball.element.remove();
-        });
+        // Remove all game elements from DOM
+        this.balls.forEach(ball => ball.element && ball.element.remove());
+        this.bricks.forEach(brick => brick.element && brick.element.remove());
+        this.powerUps.forEach(powerUp => powerUp.element && powerUp.element.remove());
+        this.paddle.element && this.paddle.element.remove();
+
+        // Clear arrays
         this.balls = [];
-
-        // Remove all bricks
-        this.bricks.forEach(brick => {
-            if (brick.element) brick.element.remove();
-        });
         this.bricks = [];
-
-        // Remove all power-ups
-        this.powerUps.forEach(powerUp => {
-            if (powerUp.element) powerUp.element.remove();
-        });
         this.powerUps = [];
-
-        // Remove paddle
-        if (this.paddle && this.paddle.element) {
-            this.paddle.element.remove();
-        }
-
         this.gameObjects = [];
-
-        
-        // Destroy input handler
-        if (this.inputHandler) {
-            this.inputHandler.destroy();
-        }
     }
 
     restart() {
+        // Clear all screens first
         if (this.activeGameOverScreen) {
             this.activeGameOverScreen.remove();
             this.activeGameOverScreen = null;
         }
+        if (this.activePauseScreen) {
+            this.activePauseScreen.remove();
+            this.activePauseScreen = null;
+        }
         
-        // Clear all game objects and input handlers
+        // Clear all game objects
         this.clearGameObjects();
         
         // Reset game state
@@ -376,19 +400,20 @@ export default class Game {
         this.currentLevel = 0;
         this.gamestate = GAMESTATE.MENU;
         
-        // Create new paddle and ball
+        // Create new game objects
         this.paddle = new Paddle(this);
         this.ball = new Ball(this);
         this.balls = [this.ball];
         
-        // Create new input handler
+        // Reset input handler
+        if (this.inputHandler) {
+            this.inputHandler.destroy();
+        }
         this.inputHandler = new InputHandler(this.paddle, this);
         
-        // Start new game
+        // Start fresh
         this.start();
         this.updateScoreboard();
-
-        this.initializeKeyboardControls();
     }
 
     initializeKeyboardControls() {
@@ -399,16 +424,9 @@ export default class Game {
         
         // Create new handler
         this.escKeyHandler = (event) => {
-            if (event.key === "Escape") {
-                if (this.gamestate === GAMESTATE.PLAY) {
-                    this.gamestate = GAMESTATE.PAUSE;
-                } else if (this.gamestate === GAMESTATE.PAUSE) {
-                    this.gamestate = GAMESTATE.PLAY;
-                    if (this.activePauseScreen) {
-                        this.activePauseScreen.remove();
-                        this.activePauseScreen = null;
-                    }
-                }
+            if (event.key === "Escape" || event.keyCode === 27) {
+                event.preventDefault();
+                this.pause();
             }
         };
         

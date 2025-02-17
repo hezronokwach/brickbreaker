@@ -112,3 +112,39 @@ body {
     will-change: transform;
     transform: translateZ(0);
 }
+
+.pause-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #E63946;
+    font-family: 'Press Start 2P', cursive;
+    z-index: 1000;
+    background: rgba(29, 53, 87, 0.95);
+    padding: 20px;
+    border: 2px solid #457B9D;
+    border-radius: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: auto;
+}
+
+.pause-screen button {
+    font-family: 'Press Start 2P', cursive;
+    padding: 15px 30px;
+    margin: 10px;
+    cursor: pointer;
+    background: #A8DADC;
+    color: #1D3557;
+    border: 2px solid #457B9D;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.pause-screen button:hover {
+    background: #457B9D;
+    color: #F1FAEE;
+    transform: scale(1.05);
+}

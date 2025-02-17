@@ -1,4 +1,4 @@
-import Game from "./game.js";
+import Game, {GAMESTATE} from "./game.js";
 
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 600;
@@ -14,8 +14,13 @@ function startGame() {
             let deltaTime = time - lastTime;
             lastTime = time;
             
-            game.update(deltaTime);
+            // Always draw even when paused
             game.draw();
+            
+            // Only update game logic when not paused
+            if (game.gamestate !== GAMESTATE.PAUSE) {
+                game.update(deltaTime);
+            }
             
             requestAnimationFrame(gameLoop);
         }
