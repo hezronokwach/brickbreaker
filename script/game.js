@@ -357,18 +357,17 @@ export default class Game {
         } else if (this.gamestate === GAMESTATE.PAUSE) {
             this.gamestate = GAMESTATE.PLAY;
             if (this.activePauseScreen) {
-                this.hideOverlay(this.activePauseScreen);
+                this.activePauseScreen.remove();
                 this.activePauseScreen = null;
             }
         }
     }
 
     createPauseScreen() {
-        if (this.activePauseScreen) return;
-        
         const pauseScreen = document.createElement('div');
         pauseScreen.className = 'pause-screen';
         pauseScreen.style.cssText = overlayStyles;
+        pauseScreen.style.opacity = '1'; // Show immediately
         
         pauseScreen.innerHTML = `
             <h1 style="font-size: 2em; margin-bottom: 20px;">PAUSED</h1>
@@ -378,24 +377,26 @@ export default class Game {
         `;
         
         this.gameContainer.appendChild(pauseScreen);
-        this.activePauseScreen = pauseScreen;
-    
-        // Add event listeners
-        pauseScreen.querySelector('#pauseContinueButton').onclick = () => {
+        this.activePauseScreen = pauseScreen; // Track active screen
+
+        // Continue button
+        const continueButton = pauseScreen.querySelector('#pauseContinueButton');
+        continueButton.onclick = () => {
             this.gamestate = GAMESTATE.PLAY;
-            this.hideOverlay(this.activePauseScreen);
+            pauseScreen.remove();
             this.activePauseScreen = null;
         };
         
-        pauseScreen.querySelector('#pauseRestartButton').onclick = () => {
+        // Restart button
+        const restartButton = pauseScreen.querySelector('#pauseRestartButton');
+        restartButton.onclick = () => {
+            pauseScreen.remove();
+            this.activePauseScreen = null;
+            this.gamestate = GAMESTATE.PLAY;
             this.restart();
         };
-    
-        requestAnimationFrame(() => {
-            pauseScreen.style.opacity = '1';
-        });
     }
-    
+
     addScore(points) {
         this.score += points;
         this.updateScoreboard();

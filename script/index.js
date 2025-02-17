@@ -10,12 +10,17 @@ function startGame() {
         console.log('Game initialized');
         
         let lastTime = 0;
-        function gameLoop(time) {
-            let deltaTime = time - lastTime;
-            lastTime = time;
+        function gameLoop(timestamp) {
+            if (!lastTime) {
+                lastTime = timestamp;
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+        
+            const deltaTime = Math.min(timestamp - lastTime, 16.67); // Cap at ~60FPS
+            lastTime = timestamp;
             
-            // Always draw even when paused
-            game.draw();
+            game.draw(deltaTime); // Always draw
             
             // Only update game logic when not paused
             if (game.gamestate !== GAMESTATE.PAUSE) {
