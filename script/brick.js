@@ -23,8 +23,8 @@ export default class Brick {
     }
 
     draw() {
-        this.element.style.left = `${this.position.x}px`;
-        this.element.style.top = `${this.position.y}px`;
+        // Use transform instead of left/top
+        this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
     }
 
     update() {

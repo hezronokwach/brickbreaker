@@ -27,6 +27,8 @@ const overlayStyles = `
     padding: 20px;
     border: 2px solid #457B9D;
     border-radius: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 `;
 
 const buttonStyles = `
@@ -426,5 +428,20 @@ export default class Game {
         
         this.gameContainer.appendChild(levelScreen);
         setTimeout(() => levelScreen.remove(), 2000);
+    }
+
+    showOverlay(element) {
+        requestAnimationFrame(() => {
+            element.style.opacity = '1';
+        });
+    }
+
+    hideOverlay(element) {
+        element.style.opacity = '0';
+        element.addEventListener('transitionend', () => {
+            if (element.parentNode) {
+                element.parentNode.removeChild(element);
+            }
+        }, { once: true });
     }
 }
