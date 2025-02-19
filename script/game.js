@@ -1,7 +1,6 @@
 import Paddle from './paddle.js';
 import InputHandler from './input.js';
 import Ball from './ball.js';
-import Brick from './brick.js';
 import { level1, buildLevel,level2 } from './levels.js';
 
 export const GAMESTATE = {
@@ -12,7 +11,6 @@ export const GAMESTATE = {
     NEWLEVEL: 4,
     WIN: 5
 };
-
 
 
 // Update overlayStyles to remove transitions
@@ -178,170 +176,7 @@ export default class Game {
         this.updateScoreboard();
     }
 
-   
 
-    draw() {
-        if (!this.gameContainer) return;
-        
-        // Draw game objects
-        this.gameObjects.forEach(object => object.draw());
-        this.bricks.forEach(brick => brick.draw());
-
-        
-        // Handle game over screen
-        if (this.gamestate === GAMESTATE.OVER) {
-            if (!this.activeGameOverScreen) {
-                const gameOverScreen = document.createElement('div');
-                gameOverScreen.className = 'game-over-screen';
-                gameOverScreen.style.cssText = overlayStyles;
-                
-                gameOverScreen.innerHTML = `
-                    <h1 style="font-size: 2em; margin-bottom: 20px; color: #E63946;">GAME OVER</h1>
-                    <p style="margin: 15px 0; color: #F1FAEE;">Final Score: ${this.score}</p>
-                    <p style="margin: 15px 0; color: #F1FAEE;">Time: ${Math.floor(this.time)}s</p>
-                    <button id="restartButton" style="${buttonStyles}">
-                        PLAY AGAIN
-                    </button>
-                `;
-                
-                this.gameContainer.appendChild(gameOverScreen);
-                this.activeGameOverScreen = gameOverScreen;
-                
-                // Add button hover effects
-                const restartButton = gameOverScreen.querySelector('#restartButton');
-                restartButton.addEventListener('mouseover', () => {
-                    restartButton.style.background = '#457B9D';
-                    restartButton.style.color = '#F1FAEE';
-                    restartButton.style.transform = 'scale(1.05)';
-                });
-                restartButton.addEventListener('mouseout', () => {
-                    restartButton.style.background = '#A8DADC';
-                    restartButton.style.color = '#1D3557';
-                    restartButton.style.transform = 'scale(1)';
-                });
-                
-                // Show screen with fade in
-                requestAnimationFrame(() => {
-                    gameOverScreen.style.opacity = '1';
-                });
-                
-                restartButton.onclick = () => {
-                    this.restart();
-                    gameOverScreen.remove();
-                    this.activeGameOverScreen = null;
-                };
-            }
-        } else {
-            if (this.activeGameOverScreen) {
-                this.activeGameOverScreen.remove();
-                this.activeGameOverScreen = null;
-            }
-        }
-
-        // Handle pause screen
-        if (this.gamestate === GAMESTATE.PAUSE) {
-            if (!this.activePauseScreen) {
-                const pauseScreen = document.createElement('div');
-                pauseScreen.className = 'pause-screen';
-                pauseScreen.style.cssText = overlayStyles;
-                
-                pauseScreen.innerHTML = `
-                    <h1 style="font-size: 2em; margin-bottom: 20px;">PAUSED</h1>
-                    <p style="margin: 15px 0;">Score: ${this.score}</p>
-                    <p style="margin: 15px 0;">Press ESC to continue</p>
-                    <button id="pauseContinueButton" style="${buttonStyles}">
-                        CONTINUE
-                    </button>
-                    <button id="pauseRestartButton" style="${buttonStyles}">
-                        RESTART
-                    </button>
-                `;
-                
-                this.gameContainer.appendChild(pauseScreen);
-                this.activePauseScreen = pauseScreen;
-
-                const buttons = pauseScreen.querySelectorAll('button');
-                buttons.forEach(button => {
-                    button.addEventListener('mouseover', () => {
-                        button.style.background = '#555';
-                    });
-                    button.addEventListener('mouseout', () => {
-                        button.style.background = '#333';
-                    });
-                });
-                
-                pauseScreen.querySelector('#pauseContinueButton').onclick = () => {
-                    this.gamestate = GAMESTATE.PLAY;
-                    this.activePauseScreen.remove();
-                    this.activePauseScreen = null;
-                };
-                
-                pauseScreen.querySelector('#pauseRestartButton').onclick = () => {
-                    this.restart();
-                    this.activePauseScreen.remove();
-                    this.activePauseScreen = null;
-                };
-            }
-        } else if (this.activePauseScreen) {
-            this.activePauseScreen.remove();
-            this.activePauseScreen = null;
-        }
-
-        if (this.gamestate === GAMESTATE.WIN) {
-            if (!this.activeWinScreen) {
-                const winScreen = document.createElement('div');
-                winScreen.className = 'win-screen';
-                winScreen.style.cssText = overlayStyles;
-                
-                const minutes = Math.floor(this.time / 60);
-                const seconds = Math.floor(this.time % 60);
-                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                
-                winScreen.innerHTML = `
-                    <h1 style="font-size: 2em; margin-bottom: 20px; color: #66FF66;">YOU WIN!</h1>
-                    <p style="margin: 15px 0; color: #F1FAEE;">Congratulations!</p>
-                    <p style="margin: 15px 0; color: #F1FAEE;">Final Score: ${this.score}</p>
-                    <p style="margin: 15px 0; color: #F1FAEE;">Time: ${timeString}</p>
-                    <button id="winRestartButton" style="${buttonStyles}">
-                        PLAY AGAIN
-                    </button>
-                `;
-                
-                this.gameContainer.appendChild(winScreen);
-                this.activeWinScreen = winScreen;
-                
-                // Add button hover effects
-                const restartButton = winScreen.querySelector('#winRestartButton');
-                restartButton.addEventListener('mouseover', () => {
-                    restartButton.style.background = '#457B9D';
-                    restartButton.style.color = '#F1FAEE';
-                    restartButton.style.transform = 'scale(1.05)';
-                });
-                restartButton.addEventListener('mouseout', () => {
-                    restartButton.style.background = '#A8DADC';
-                    restartButton.style.color = '#1D3557';
-                    restartButton.style.transform = 'scale(1)';
-                });
-                
-                // Show screen with fade in
-                requestAnimationFrame(() => {
-                    winScreen.style.opacity = '1';
-                });
-                
-                restartButton.onclick = () => {
-                    this.restart();
-                    winScreen.remove();
-                    this.activeWinScreen = null;
-                };
-            }
-        } else if (this.activeWinScreen) {
-            this.activeWinScreen.remove();
-            this.activeWinScreen = null;
-        }
-
-        this.balls.forEach(ball => ball.draw());
-        this.powerUps.forEach(powerUp => powerUp.draw());
-    }
 
     updateScoreboard() {
         if (this.timerElement) {
@@ -356,70 +191,130 @@ export default class Game {
     }
 
     render(deltaTime) {
-        // Use deltaTime for smooth animations
+        // Always render game objects the same way as during play
         this.paddle.draw(deltaTime);
         this.balls.forEach(ball => ball.draw(deltaTime));
         this.bricks.forEach(brick => brick.draw(deltaTime));
         this.powerUps.forEach(powerUp => powerUp.draw(deltaTime));
-        
-        // Force frame updates with small movement
-        if (this.gamestate === GAMESTATE.PAUSE) {
-            this.gameObjects.forEach(object => {
-                if (object.element) {
-                    const timeScale = 0.4; // Small scale factor for smooth motion
-                    const movement = Math.min(deltaTime, 16.67) * timeScale;   
-                    object.element.style.transform += `translateY(${movement}px)`;
+    
+        // Menu handling based on state
+        switch(this.gamestate) {
+            case GAMESTATE.PAUSE:
+                if (!this.activePauseScreen) {
+                    this.createPauseMenu();
                 }
-            });
+                break;
+    
+            case GAMESTATE.OVER:
+                if (!this.activeGameOverScreen) {
+                    this.createGameOverMenu();
+                }
+                break;
+    
+            case GAMESTATE.WIN:
+                if (!this.activeWinScreen) {
+                    this.createWinMenu();
+                }
+                break;
         }
     }
-
-    // render(deltaTime) {
-    //     // Use deltaTime for smooth animations
-    //     this.paddle.draw(deltaTime);
-    //     this.balls.forEach(ball => ball.draw(deltaTime));
-    //     this.bricks.forEach(brick => brick.draw(deltaTime));
-    //     this.powerUps.forEach(powerUp => powerUp.draw(deltaTime));
         
-    //     // Force frame updates with small movement
-    //     if (this.gamestate === GAMESTATE.PAUSE) {
-    //         this.gameObjects.forEach(object => {
-    //             if (object.element) {
-    //                 const timeScale = 0.4; // Small scale factor for smooth motion
-    //                 const movement = Math.min(deltaTime, 16.67) * timeScale;   
-    //                                  object.element.style.transform += `translateY(${movement}px)`;
-    //             }
-    //         });
-    //     }
-    // }
     
-    // Update pause method
-pause() {
-    if (this.gamestate === GAMESTATE.PLAY) {
-        this.gamestate = GAMESTATE.PAUSE;
-    } else if (this.gamestate === GAMESTATE.PAUSE) {
-        this.gamestate = GAMESTATE.PLAY;
+    pause() {
+        if (this.gamestate === GAMESTATE.PAUSE) {
+            if (this.activePauseScreen) {
+                this.activePauseScreen.remove();
+                this.activePauseScreen = null;
+            }
+            this.gamestate = GAMESTATE.PLAY;
+        } else {
+            this.gamestate = GAMESTATE.PAUSE;
+        }
     }
-}
 
 // Update pause method
 
-    createPauseScreen() {
-        // Create pause screen only once and cache it
-        if (!this.pauseScreenTemplate) {
-            const screen = document.createElement('div');
-            screen.className = 'pause-screen';
-            screen.style.cssText = overlayStyles;
-            // Remove transitions and animations
-            screen.style.transition = 'none';
-            this.pauseScreenTemplate = screen;
-        }
-        
-        // Use cached template
-        const pauseScreen = this.pauseScreenTemplate.cloneNode(true);
-        this.gameContainer.appendChild(pauseScreen);
-        this.activePauseScreen = pauseScreen;
-    }
+createPauseMenu() {
+    const pauseScreen = document.createElement('div');
+    pauseScreen.className = 'pause-screen';
+    pauseScreen.style.cssText = overlayStyles;
+    
+    pauseScreen.innerHTML = `
+        <h1 style="font-size: 2em; margin-bottom: 20px;">PAUSED</h1>
+        <p style="margin: 15px 0;">Score: ${this.score}</p>
+        <p style="margin: 15px 0;">Press ESC to continue</p>
+        <button id="pauseContinueButton" style="${buttonStyles}">
+            CONTINUE
+        </button>
+        <button id="pauseRestartButton" style="${buttonStyles}">
+            RESTART
+        </button>
+    `;
+    
+    this.gameContainer.appendChild(pauseScreen);
+    this.activePauseScreen = pauseScreen;
+
+    // Add button handlersf
+    pauseScreen.querySelector('#pauseContinueButton').onclick = () => {
+        this.gamestate = GAMESTATE.PLAY;
+        pauseScreen.remove();
+        this.activePauseScreen = null;
+    };
+    
+    pauseScreen.querySelector('#pauseRestartButton').onclick = () => {
+        this.restart();
+        pauseScreen.remove();
+        this.activePauseScreen = null;
+    };
+}
+
+createGameOverMenu() {
+    const gameOverScreen = document.createElement('div');
+    gameOverScreen.className = 'game-over-screen';
+    gameOverScreen.style.cssText = overlayStyles;
+    
+    gameOverScreen.innerHTML = `
+        <h1 style="font-size: 2em; margin-bottom: 20px; color: #E63946;">GAME OVER</h1>
+        <p style="margin: 15px 0; color: #F1FAEE;">Final Score: ${this.score}</p>
+        <p style="margin: 15px 0; color: #F1FAEE;">Time: ${Math.floor(this.time)}s</p>
+        <button id="restartButton" style="${buttonStyles}">
+            PLAY AGAIN
+        </button>
+    `;
+    
+    this.gameContainer.appendChild(gameOverScreen);
+    this.activeGameOverScreen = gameOverScreen;
+    
+    gameOverScreen.querySelector('#restartButton').onclick = () => {
+        this.restart();
+        gameOverScreen.remove();
+        this.activeGameOverScreen = null;
+    };
+}
+
+createWinMenu() {
+    const winScreen = document.createElement('div');
+    winScreen.className = 'win-screen';
+    winScreen.style.cssText = overlayStyles;
+    
+    winScreen.innerHTML = `
+        <h1 style="font-size: 2em; margin-bottom: 20px; color: #2A9D8F;">YOU WIN!</h1>
+        <p style="margin: 15px 0; color: #F1FAEE;">Final Score: ${this.score}</p>
+        <p style="margin: 15px 0; color: #F1FAEE;">Time: ${Math.floor(this.time)}s</p>
+        <button id="playAgainButton" style="${buttonStyles}">
+            PLAY AGAIN
+        </button>
+    `;
+    
+    this.gameContainer.appendChild(winScreen);
+    this.activeWinScreen = winScreen;
+    
+    winScreen.querySelector('#playAgainButton').onclick = () => {
+        this.restart();
+        winScreen.remove();
+        this.activeWinScreen = null;
+    };
+}
 
     addScore(points) {
         this.score += points;
@@ -509,18 +404,4 @@ pause() {
         setTimeout(() => levelScreen.remove(), 2000);
     }
 
-    showOverlay(element) {
-        requestAnimationFrame(() => {
-            element.style.opacity = '1';
-        });
-    }
-
-    hideOverlay(element) {
-        element.style.opacity = '0';
-        element.addEventListener('transitionend', () => {
-            if (element.parentNode) {
-                element.parentNode.removeChild(element);
-            }
-        }, { once: true });
-    }
 }

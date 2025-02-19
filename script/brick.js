@@ -22,8 +22,7 @@ export default class Brick {
         }
     }
 
-    draw() {
-        // Use transform instead of left/top
+    draw(deltaTime) {
         this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
     }
 

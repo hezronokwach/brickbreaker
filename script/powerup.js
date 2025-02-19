@@ -20,13 +20,15 @@ export default class PowerUp {
         this.game.gameContainer.appendChild(this.element);
     }
 
-    draw() {
-        this.element.style.left = `${this.position.x}px`;
-        this.element.style.top = `${this.position.y}px`;
+    draw(deltaTime) {
+        const movement = deltaTime ? (this.speed.y * (deltaTime / 16.67)) : 0;
+        this.element.style.transform = `translate(${this.position.x}px, ${this.position.y + movement}px)`;
     }
 
     update(deltaTime) {
-        this.position.y += this.speed.y * (deltaTime / 16.67);
+        const speedY = this.speed.y * (deltaTime / 16.67);
+        this.position.y += speedY;
+
         
         // Check paddle collision
         if (this.collidesWithPaddle()) {

@@ -28,8 +28,6 @@ function startGame() {
             // Only update game logic when not paused
             if (game.gamestate !== GAMESTATE.PAUSE) {
                 game.update(deltaTime);
-            }else{
-                game.update(0);
             }
         }
         
