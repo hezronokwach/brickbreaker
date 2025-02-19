@@ -10,28 +10,38 @@ function startGame() {
         console.log('Game initialized');
 
         let lastTime = 0;
+        let rafId;
 
         function gameLoop(timestamp) {
-            requestAnimationFrame(gameLoop);
-            
             if (!lastTime) {
                 lastTime = timestamp;
+                rafId = requestAnimationFrame(gameLoop);
                 return;
             }
             
             const deltaTime = Math.min(timestamp - lastTime, 16.67);
             lastTime = timestamp;
             
-            // Always render game state to maintain frame markers
+            // During pause: Force tiny movement to maintain frame timing
+            if (game.gamestate === GAMESTATE.PAUSE) {
+                const movement = (deltaTime % 2) * 0.001;
+                game.gameContainer.style.transform = `translateZ(0) translateY(${movement}px)`;
+            }
+            
+            // Always render game state
             game.render(deltaTime);
             
             // Only update game logic when not paused
             if (game.gamestate !== GAMESTATE.PAUSE) {
                 game.update(deltaTime);
             }
+
+            // Request next frame at end of loop
+            rafId = requestAnimationFrame(gameLoop);
         }
         
-        requestAnimationFrame(gameLoop);
+        // Start game loop
+        rafId = requestAnimationFrame(gameLoop);
     } catch (error) {
         console.error('Failed to start game:', error);
     }

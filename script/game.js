@@ -401,7 +401,7 @@ createWinMenu() {
         `;
         
         this.gameContainer.appendChild(levelScreen);
-        setTimeout(() => levelScreen.remove(), 2000);
+        setTimeout(() => levelScreen.remove(), 1000);
     }
 
 }
