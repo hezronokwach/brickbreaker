@@ -366,8 +366,8 @@ export default class Game {
         if (this.gamestate === GAMESTATE.PAUSE) {
             this.gameObjects.forEach(object => {
                 if (object.element) {
-                    const movement = Math.min(deltaTime, 16.67);
-
+                    const timeScale = 0.4; // Small scale factor for smooth motion
+                    const movement = Math.min(deltaTime, 16.67) * timeScale;   
                     object.element.style.transform += `translateY(${movement}px)`;
                 }
             });
@@ -375,25 +375,21 @@ export default class Game {
     }
 
     // render(deltaTime) {
-    //     // Cap deltaTime to maintain consistent 60 FPS
-    //     const cappedDeltaTime = Math.min(deltaTime, 16.67);
+    //     // Use deltaTime for smooth animations
+    //     this.paddle.draw(deltaTime);
+    //     this.balls.forEach(ball => ball.draw(deltaTime));
+    //     this.bricks.forEach(brick => brick.draw(deltaTime));
+    //     this.powerUps.forEach(powerUp => powerUp.draw(deltaTime));
         
-    //     // Basic drawing without animations
-    //     this.paddle.draw();
-    //     this.balls.forEach(ball => ball.draw());
-    //     this.bricks.forEach(brick => brick.draw());
-    //     this.powerUps.forEach(powerUp => powerUp.draw());
-        
-    //     // Force consistent frame updates during pause
+    //     // Force frame updates with small movement
     //     if (this.gamestate === GAMESTATE.PAUSE) {
-    //         // Use transform for hardware acceleration
     //         this.gameObjects.forEach(object => {
     //             if (object.element) {
-    //                 object.element.style.transform = `translate(${object.position.x}px, ${object.position.y}px)`;
+    //                 const timeScale = 0.4; // Small scale factor for smooth motion
+    //                 const movement = Math.min(deltaTime, 16.67) * timeScale;   
+    //                                  object.element.style.transform += `translateY(${movement}px)`;
     //             }
     //         });
-    //         // Force reflow to maintain frame rate
-    //         this.gameContainer.style.transform = 'translateZ(0)';
     //     }
     // }
     
