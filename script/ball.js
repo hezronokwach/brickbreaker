@@ -16,12 +16,12 @@ export default class Ball {
             x: this.game.gamewidth / 2 - this.size / 2,
             y: this.game.gameheight - 100
         };
-        this.draw(); // Draw immediately after reset
+        this.draw(0); // Draw immediately after reset
     }
 
-    draw() {
-        // Replace direct style assignments with transform
-        this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
+    draw(deltaTime) {
+        const movement = deltaTime ? (this.speed.y * (deltaTime / 16.67)) : 0;
+        this.element.style.transform = `translate(${this.position.x}px, ${this.position.y + movement}px)`;
     }
 
     update(deltaTime) {
