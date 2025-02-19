@@ -13,7 +13,9 @@ export const GAMESTATE = {
     WIN: 5
 };
 
-// Add shared styles at class level
+
+
+// Update overlayStyles to remove transitions
 const overlayStyles = `
     position: absolute;
     top: 50%;
@@ -27,8 +29,7 @@ const overlayStyles = `
     padding: 20px;
     border: 2px solid #457B9D;
     border-radius: 10px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    opacity: 1;
 `;
 
 const buttonStyles = `
@@ -113,24 +114,26 @@ export default class Game {
         // Update display
         this.updateScoreboard();
     }
-
     update(deltaTime) {
         if (this.gamestate !== GAMESTATE.PLAY) return;
-
+    
+        // Cap deltaTime to ensure a maximum frame time of 16.67ms
+        const cappedDeltaTime = Math.min(deltaTime, 16.67);
+    
         // Update paddle
-        this.paddle.update(deltaTime);
-        
-        // Update and filter balls
+        this.paddle.update(cappedDeltaTime);
+    
+        // Update balls
         let ballsToRemove = [];
         this.balls.forEach(ball => {
-            if (!ball.update(deltaTime)) {
+            if (!ball.update(cappedDeltaTime)) {
                 ballsToRemove.push(ball);
             }
         });
-
+    
         // Remove lost balls
         this.balls = this.balls.filter(ball => !ballsToRemove.includes(ball));
-
+    
         // Check if all balls are lost
         if (this.balls.length === 0) {
             this.lives--;
@@ -142,7 +145,7 @@ export default class Game {
                 this.balls = [this.ball];
             }
         }
-
+    
         // Check for level completion
         if (this.bricks.length === 0) {
             this.currentLevel++;
@@ -160,20 +163,22 @@ export default class Game {
                 }, 1000);
             }
         }
-
+    
         // Update bricks and powerups
         this.bricks.forEach(brick => brick.update(deltaTime));
         this.bricks = this.bricks.filter(brick => !brick.delete);
-
+    
         this.powerUps = this.powerUps.filter(powerUp => {
             powerUp.update(deltaTime);
             return !powerUp.delete;
         });
-
+    
         // Update timer and scoreboard
         this.time += deltaTime / 1000;
         this.updateScoreboard();
     }
+
+   
 
     draw() {
         if (!this.gameContainer) return;
@@ -350,51 +355,74 @@ export default class Game {
         }
     }
 
-    pause() {
-        if (this.gamestate === GAMESTATE.PLAY) {
-            this.gamestate = GAMESTATE.PAUSE;
-            this.createPauseScreen();
-        } else if (this.gamestate === GAMESTATE.PAUSE) {
-            this.gamestate = GAMESTATE.PLAY;
-            if (this.activePauseScreen) {
-                this.activePauseScreen.remove();
-                this.activePauseScreen = null;
-            }
+    render(deltaTime) {
+        // Use deltaTime for smooth animations
+        this.paddle.draw(deltaTime);
+        this.balls.forEach(ball => ball.draw(deltaTime));
+        this.bricks.forEach(brick => brick.draw(deltaTime));
+        this.powerUps.forEach(powerUp => powerUp.draw(deltaTime));
+        
+        // Force frame updates with small movement
+        if (this.gamestate === GAMESTATE.PAUSE) {
+            this.gameObjects.forEach(object => {
+                if (object.element) {
+                    const movement = Math.min(deltaTime, 16.67);
+
+                    object.element.style.transform += `translateY(${movement}px)`;
+                }
+            });
         }
     }
 
-    createPauseScreen() {
-        const pauseScreen = document.createElement('div');
-        pauseScreen.className = 'pause-screen';
-        pauseScreen.style.cssText = overlayStyles;
-        pauseScreen.style.opacity = '1'; // Show immediately
+    // render(deltaTime) {
+    //     // Cap deltaTime to maintain consistent 60 FPS
+    //     const cappedDeltaTime = Math.min(deltaTime, 16.67);
         
-        pauseScreen.innerHTML = `
-            <h1 style="font-size: 2em; margin-bottom: 20px;">PAUSED</h1>
-            <p style="margin: 15px 0;">Score: ${this.score}</p>
-            <button id="pauseContinueButton" style="${buttonStyles}">CONTINUE</button>
-            <button id="pauseRestartButton" style="${buttonStyles}">RESTART</button>
-        `;
+    //     // Basic drawing without animations
+    //     this.paddle.draw();
+    //     this.balls.forEach(ball => ball.draw());
+    //     this.bricks.forEach(brick => brick.draw());
+    //     this.powerUps.forEach(powerUp => powerUp.draw());
         
-        this.gameContainer.appendChild(pauseScreen);
-        this.activePauseScreen = pauseScreen; // Track active screen
+    //     // Force consistent frame updates during pause
+    //     if (this.gamestate === GAMESTATE.PAUSE) {
+    //         // Use transform for hardware acceleration
+    //         this.gameObjects.forEach(object => {
+    //             if (object.element) {
+    //                 object.element.style.transform = `translate(${object.position.x}px, ${object.position.y}px)`;
+    //             }
+    //         });
+    //         // Force reflow to maintain frame rate
+    //         this.gameContainer.style.transform = 'translateZ(0)';
+    //     }
+    // }
+    
+    // Update pause method
+pause() {
+    if (this.gamestate === GAMESTATE.PLAY) {
+        this.gamestate = GAMESTATE.PAUSE;
+    } else if (this.gamestate === GAMESTATE.PAUSE) {
+        this.gamestate = GAMESTATE.PLAY;
+    }
+}
 
-        // Continue button
-        const continueButton = pauseScreen.querySelector('#pauseContinueButton');
-        continueButton.onclick = () => {
-            this.gamestate = GAMESTATE.PLAY;
-            pauseScreen.remove();
-            this.activePauseScreen = null;
-        };
+// Update pause method
+
+    createPauseScreen() {
+        // Create pause screen only once and cache it
+        if (!this.pauseScreenTemplate) {
+            const screen = document.createElement('div');
+            screen.className = 'pause-screen';
+            screen.style.cssText = overlayStyles;
+            // Remove transitions and animations
+            screen.style.transition = 'none';
+            this.pauseScreenTemplate = screen;
+        }
         
-        // Restart button
-        const restartButton = pauseScreen.querySelector('#pauseRestartButton');
-        restartButton.onclick = () => {
-            pauseScreen.remove();
-            this.activePauseScreen = null;
-            this.gamestate = GAMESTATE.PLAY;
-            this.restart();
-        };
+        // Use cached template
+        const pauseScreen = this.pauseScreenTemplate.cloneNode(true);
+        this.gameContainer.appendChild(pauseScreen);
+        this.activePauseScreen = pauseScreen;
     }
 
     addScore(points) {
