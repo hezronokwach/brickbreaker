@@ -129,9 +129,19 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: auto;
-    will-change: opacity;
+    will-change: transform, opacity;
     transform: translateZ(0);
     backface-visibility: hidden;
+}
+
+.pulse {
+    animation: pulse 0.5s infinite alternate;
+    color: #E63946;
+}
+
+@keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
 }
 
 .pause-screen button {

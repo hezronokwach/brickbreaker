@@ -22,7 +22,8 @@ export default class Brick {
         }
     }
 
-    draw(deltaTime) {
+    draw() {
+        // Remove deltaTime dependency
         this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
     }
 
