@@ -48,15 +48,70 @@ export default class Game {
         this.gameheight = gameheight;
         this.gamestate = GAMESTATE.MENU;
         
+        // Frame timing
+        this.lastTime = 0;
+        this.frameCount = 0;
+        this.lastFPSUpdate = 0;
+        this.currentFPS = 0;
+        
+        // Bind game loop
+        this.animationFrame = null;
+        this.boundGameLoop = this.gameLoop.bind(this);
+        
+        // Initialize game objects
+        this.initializeDOM();
+        this.createGameObjects();
+        
+        // Start game loop
+        requestAnimationFrame(this.boundGameLoop);
+    }
+
+    gameLoop(timestamp) {
+        // Calculate delta time
+        const deltaTime = this.lastTime ? timestamp - this.lastTime : 0;
+        this.lastTime = timestamp;
+
+        // Track FPS
+        this.frameCount++;
+        if (timestamp - this.lastFPSUpdate > 1000) {
+            this.currentFPS = this.frameCount;
+            this.frameCount = 0;
+            this.lastFPSUpdate = timestamp;
+            console.log('FPS:', this.currentFPS);
+        }
+
+        // Always render, regardless of state
+        this.render();
+
+        // Only update game logic if not paused
+        if (this.gamestate === GAMESTATE.PLAY) {
+            this.update(deltaTime);
+        }
+
+        // Continue the loop
+        this.animationFrame = requestAnimationFrame(this.boundGameLoop);
+    }
+
+    initializeDOM() {
+        this.gameContainer = document.getElementById('gameContainer');
+        this.scoreboard = document.getElementById('scoreboard');
+        this.pauseMenu = document.getElementById('pauseMenu');
+        this.timerElement = document.getElementById('timer');
+        this.scoreElement = document.getElementById('score');
+        this.livesElement = document.getElementById('lives');
+
+        if (!this.gameContainer) {
+            throw new Error('Game container not found!');
+        }
+    }
+
+    createGameObjects() {
         // Initialize game state
         this.lives = 2;
         this.score = 0;
         this.time = 0;
         this.levels = [level1, level2]; // Add level2 to levels array
         this.currentLevel = 0;
-
-        // Get DOM elements
-        this.initializeDOM();
         
         // Initialize empty arrays first
         this.gameObjects = [];
@@ -75,19 +130,11 @@ export default class Game {
 
         this.balls = [this.ball]; // Store all active balls
         this.powerUps = []; // Store active power-ups
-    }
 
-    initializeDOM() {
-        this.gameContainer = document.getElementById('gameContainer');
-        this.scoreboard = document.getElementById('scoreboard');
-        this.pauseMenu = document.getElementById('pauseMenu');
-        this.timerElement = document.getElementById('timer');
-        this.scoreElement = document.getElementById('score');
-        this.livesElement = document.getElementById('lives');
-
-        if (!this.gameContainer) {
-            throw new Error('Game container not found!');
-        }
+        // Add FPS tracking
+        this.frameCount = 0;
+        this.lastFPSUpdate = 0;
+        this.currentFPS = 0;
     }
 
     start() {
@@ -190,13 +237,17 @@ export default class Game {
         }
     }
 
-    render(deltaTime) {
-        // Always render game objects the same way as during play
-        this.paddle.draw(deltaTime);
-        this.balls.forEach(ball => ball.draw(deltaTime));
-        this.bricks.forEach(brick => brick.draw(deltaTime));
-        this.powerUps.forEach(powerUp => powerUp.draw(deltaTime));
-    
+    render() {
+        // Always render game objects
+        this.paddle.draw();
+        this.balls.forEach(ball => ball.draw());
+        this.bricks.forEach(brick => brick.draw());
+        this.powerUps.forEach(powerUp => powerUp.draw());        
+        
+        this.handleMenuState();
+    }
+
+    handleMenuState() {
         // Menu handling based on state
         switch(this.gamestate) {
             case GAMESTATE.PAUSE:
@@ -222,27 +273,31 @@ export default class Game {
     
     pause() {
         if (this.gamestate === GAMESTATE.PAUSE) {
+            // Resume game
+            this.gamestate = GAMESTATE.PLAY;
+            this.lastTime = performance.now(); // Reset time to prevent large delta
             if (this.activePauseScreen) {
                 this.activePauseScreen.remove();
                 this.activePauseScreen = null;
             }
-            this.gamestate = GAMESTATE.PLAY;
         } else {
+            // Pause game
             this.gamestate = GAMESTATE.PAUSE;
+            this.createPauseMenu();
         }
     }
 
-// Update pause method
-
 createPauseMenu() {
+    if (this.activePauseScreen) return;
+
     const pauseScreen = document.createElement('div');
     pauseScreen.className = 'pause-screen';
     pauseScreen.style.cssText = overlayStyles;
     
+    // Add frame counter element
     pauseScreen.innerHTML = `
-        <h1 style="font-size: 2em; margin-bottom: 20px;">PAUSED</h1>
+        <h1 class="pulse" style="font-size: 2em; margin-bottom: 20px;">PAUSED</h1>
         <p style="margin: 15px 0;">Score: ${this.score}</p>
-        <p style="margin: 15px 0;">Press ESC to continue</p>
         <button id="pauseContinueButton" style="${buttonStyles}">
             CONTINUE
         </button>
@@ -253,6 +308,9 @@ createPauseMenu() {
     
     this.gameContainer.appendChild(pauseScreen);
     this.activePauseScreen = pauseScreen;
+
+    // Store counter element reference
+    this.pauseCounterElement = pauseScreen.querySelector('#pauseFrameCounter');
 
     // Add button handlersf
     pauseScreen.querySelector('#pauseContinueButton').onclick = () => {

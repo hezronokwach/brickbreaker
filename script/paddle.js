@@ -16,14 +16,16 @@ export default class Paddle {
         this.game.gameContainer.appendChild(this.element); // Use this.game.gameContainer
     }
 
-    draw(deltaTime) {
-        const movement = deltaTime ? (this.speed * (deltaTime / 16.67)) : 0;
-        this.element.style.transform = `translate(${this.position.x + movement}px, ${this.position.y}px)`;
+    draw() {
+        // Remove deltaTime dependency
+        this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
     }
 
     update(deltaTime) {
-        const speed = this.speed * (deltaTime / 16.67);
+        // Update speed calculations
+        const speed = this.speed * (deltaTime / 16.67); // Normalize to 60fps
         this.position.x += speed;
+
         if (this.position.x < 0) this.position.x = 0;
         if (this.position.x + this.width > this.game.gamewidth) {
             this.position.x = this.game.gamewidth - this.width;

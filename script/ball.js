@@ -19,13 +19,14 @@ export default class Ball {
         this.draw(0); // Draw immediately after reset
     }
 
-    draw(deltaTime) {
-        const movement = deltaTime ? (this.speed.y * (deltaTime / 16.67)) : 0;
-        this.element.style.transform = `translate(${this.position.x}px, ${this.position.y + movement}px)`;
+    draw() {
+        // Remove deltaTime dependency
+        this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
     }
 
     update(deltaTime) {
-        const speedX = this.speed.x * (deltaTime / 16.67);
+        // Update speed calculations
+        const speedX = this.speed.x * (deltaTime / 16.67); // Normalize to 60fps
         const speedY = this.speed.y * (deltaTime / 16.67);
 
         this.position.x += speedX;
