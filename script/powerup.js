@@ -74,12 +74,13 @@ export default class PowerUp {
 
         // Create two new balls with different angles
         for (let i = 0; i < 2; i++) {
-            const newBall = new Ball(this.game);
+            const newBall = new Ball(this.game, false); // Create non-stuck balls for multiball
             newBall.position = { 
                 x: currentBall.position.x,
                 y: currentBall.position.y 
             };
-            // Give different angles to the new balls
+            // Give different angles to the new balls and ensure they're not stuck
+            newBall.isStuck = false; // Multiball powerup creates free balls
             newBall.speed = {
                 x: currentBall.speed.x * (i === 0 ? -0.8 : 1.2),
                 y: currentBall.speed.y
