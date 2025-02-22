@@ -1,5 +1,6 @@
 import { detectCollision } from "./detectCollision.js";
 import PowerUp from "./powerup.js";
+import SoundManager from './sounds.js';
 
 
 export default class Brick {
@@ -33,6 +34,9 @@ export default class Brick {
             const collidingBall = this.game.balls.find(ball => detectCollision(ball, this));
             collidingBall.speed.y = -collidingBall.speed.y;
             
+            // Play brick hit sound
+            SoundManager.playSound('brickHit');
+
             if (this.type !== 'normal') {
                 // Create power-up
                 const powerUp = new PowerUp(
@@ -44,6 +48,8 @@ export default class Brick {
                     this.type === 'multiball' ? 'multiball' : 'extralife'
                 );
                 this.game.powerUps.push(powerUp);
+                // Play power-up spawn sound
+                SoundManager.playSound('powerUp');
             }
 
             this.delete = true;

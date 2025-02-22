@@ -1,4 +1,5 @@
 import { GAMESTATE } from "./game.js";
+
 export default class InputHandler {
     constructor(paddle, game) {
         this.paddle = paddle;
@@ -32,14 +33,15 @@ export default class InputHandler {
                     event.preventDefault();
                     this.paddle.moveRight();
                     break;
-            }
-        }
-        
-        if (event.keyCode === 32) { // Space bar
-            event.preventDefault();
-            if (this.game.gamestate === GAMESTATE.MENU || 
-                this.game.gamestate === GAMESTATE.NEWLEVEL) {
-                this.game.start();
+                case 38: // Up arrow
+                    event.preventDefault();
+                    // Release any stuck balls
+                    this.game.balls.forEach(ball => {
+                        if (ball.isStuck) {
+                            ball.release();
+                        }
+                    });
+                    break;
             }
         }
     }
