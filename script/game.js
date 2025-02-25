@@ -111,13 +111,7 @@ export default class Game {
         this.lastTime = timestamp;
 
         // Track FPS
-        this.frameCount++;
-        if (timestamp - this.lastFPSUpdate > 1000) {
-            this.currentFPS = this.frameCount;
-            this.frameCount = 0;
-            this.lastFPSUpdate = timestamp;
-            console.log('FPS:', this.currentFPS);
-        }
+        
 
         // Always render, regardless of state
         this.render();
@@ -142,6 +136,11 @@ export default class Game {
         if (!this.gameContainer) {
             throw new Error('Game container not found!');
         }
+
+        // Create a container for bricks
+        this.brickContainer = document.createElement('div');
+        this.brickContainer.className = 'brick-container';
+        this.gameContainer.appendChild(this.brickContainer);
     }
 
     createGameObjects() {

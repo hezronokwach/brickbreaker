@@ -2,7 +2,6 @@ import { detectCollision } from "./detectCollision.js";
 import PowerUp from "./powerup.js";
 import SoundManager from './sounds.js';
 
-
 export default class Brick {
     constructor(game, position, type = "normal") {
         this.game = game;
@@ -15,7 +14,7 @@ export default class Brick {
         this.element.className = 'brick';
         this.element.style.width = `${this.width}px`;
         this.element.style.height = `${this.height}px`;
-        this.game.gameContainer.appendChild(this.element); // Use this.game.gameContainer
+        this.game.brickContainer.appendChild(this.element); // Append to brick container
         this.type = type;
         this.element.classList.add(`brick-${type}`);
         if (type === 'multiball' || type === 'extralife') {

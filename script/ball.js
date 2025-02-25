@@ -77,7 +77,7 @@ export default class Ball {
             this.speed.y = -Math.abs(this.speed.y); // Ensure upward movement
             this.position.y = this.game.paddle.position.y - this.size; // Prevent sticking
             
-            SoundManager.playSound('ballbounce');
+            //SoundManager.playSound('ballbounce');
         }
 
         // Bottom wall collision - remove ball
