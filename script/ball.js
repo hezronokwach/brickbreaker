@@ -10,11 +10,12 @@ export default class Ball {
         this.element.style.height = `${this.size}px`;
         this.game.gameContainer.appendChild(this.element);
         this.isStuck = startStuck;  // Allow control of initial stuck state
+        this.initialSpeed = { x: 6, y: -4 }; // Set initial speed
         this.reset();
     }
 
     reset() {
-        this.speed = { x: 0, y: 0 }; // No speed while stuck
+        this.speed = { ...this.initialSpeed }; // Reset to initial speed
         this.isStuck = true; // Reset to stuck state
         this.updatePosition(); // Update initial position
         this.draw(); // Draw immediately after reset
@@ -37,12 +38,8 @@ export default class Ball {
 
     release() {
         if (this.isStuck) {
-            // Set initial speed with slight random angle
-            const angleVariation = (Math.random() - 0.5) * 2; // Random value between -1 and 1
-            this.speed = {
-                x: 6 * angleVariation,
-                y: -4
-            };
+            // Set initial speed
+            this.speed = { ...this.initialSpeed };
             this.isStuck = false;
             SoundManager.playSound('gameStart');
         }
@@ -76,13 +73,9 @@ export default class Ball {
 
         // Paddle collision
         if (this.game.paddle.collidesWith(this)) {
+            // Ensure upward movement and maintain consistent speed
             this.speed.y = -Math.abs(this.speed.y); // Ensure upward movement
             this.position.y = this.game.paddle.position.y - this.size; // Prevent sticking
-            
-            // Add angle based on where the ball hits the paddle
-            const paddleCenter = this.game.paddle.position.x + (this.game.paddle.width / 2);
-            const distanceFromCenter = this.position.x + (this.size / 2) - paddleCenter;
-            this.speed.x = distanceFromCenter * 0.2; // Adjust multiplier to control angle
             
             SoundManager.playSound('paddleHit');
         }
