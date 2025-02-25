@@ -10,12 +10,13 @@ class SoundManager {
 
     loadSounds() {
         // Sound effects
-        this.loadSound('paddleHit', 'assets/sounds/paddle_hit.mp3');
         this.loadSound('brickHit', 'assets/sounds/brick_hit.mp3');
         this.loadSound('powerUp', 'assets/sounds/power_up.mp3');
         this.loadSound('gameStart', 'assets/sounds/game_start.mp3');
         this.loadSound('gameOver', 'assets/sounds/game_over.mp3');
         this.loadSound('levelComplete', 'assets/sounds/level_complete.mp3');
+        this.loadSound('ballbounce', 'assets/sounds/ball3.mp3');
+
 
         // Background music
         this.music = new Audio('assets/sounds/background_music.mp3');
