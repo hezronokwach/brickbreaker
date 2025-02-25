@@ -15,7 +15,7 @@ class SoundManager {
         this.loadSound('gameStart', 'assets/sounds/game_start.mp3');
         this.loadSound('gameOver', 'assets/sounds/game_over.mp3');
         this.loadSound('levelComplete', 'assets/sounds/level_complete.mp3');
-        this.loadSound('ballbounce', 'assets/sounds/ball3.mp3');
+        //this.loadSound('ballbounce', 'assets/sounds/ball3.mp3');
 
 
         // Background music
