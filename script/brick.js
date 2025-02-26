@@ -25,26 +25,15 @@ export default class Brick {
         this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
     }
 
-    update() {
-        if (this.game.balls.some(ball => detectCollision(ball, this))) {
-            const collidingBall = this.game.balls.find(ball => detectCollision(ball, this));
-            collidingBall.speed.y = -collidingBall.speed.y;
-            
-            if (this.type !== 'normal') {
-                const powerUp = new PowerUp(
-                    this.game,
-                    {
-                        x: this.position.x + this.width/2,
-                        y: this.position.y
-                    },
-                    this.type === 'multiball' ? 'multiball' : 'extralife'
-                );
-                this.game.powerUps.push(powerUp);
+    update(deltaTime) {
+        for (let ball of this.game.balls) {
+            if (detectCollision(ball, this, deltaTime)) {
+                if (!this.delete) {
+                    this.delete = true;
+                    this.element.remove();
+                    this.game.addScore(this.points);
+                }
             }
-
-            this.delete = true;
-            this.element.remove();
-            this.game.addScore(this.points);
         }
     }
 }
