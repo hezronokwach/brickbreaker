@@ -4,37 +4,37 @@ export function detectCollision(ball, gameObject, deltaTime) {
 
     let leftOfBall = ballNextX;
     let rightOfBall = ballNextX + ball.size;
-    let bottomOfBall = ball.position.y + ball.size;
-    let topOfBall = ball.position.y;
+    let topOfBall = ballNextY;
+    let bottomOfBall = ballNextY + ball.size;
 
-    let topOfObject = gameObject.position.y;
-    let leftSideOfObject = gameObject.position.x;
-    let rightSideOfObject = gameObject.position.x + gameObject.width;
-    let bottomOfObject = gameObject.position.y + gameObject.height;
+    let gameObjectLeft = gameObject.position.x;
+    let gameObjectRight = gameObject.position.x + gameObject.width;
+    let gameObjectTop = gameObject.position.y;
+    let gameObjectBottom = gameObject.position.y + gameObject.height;
 
     let collisionTimeX = null;
     let collisionTimeY = null;
 
-    // check collision on x-axis
-    if (rightOfBall >= leftSideOfObject && leftOfBall <= rightSideOfObject) {
-        if (ball.speed.y > 0 && bottomOfBall >= topOfObject && topOfBall <= topOfObject) {
-            collisionTimeY = (topOfObject - bottomOfBall) / ball.speed.y;
-        } else if (ball.speed.y < 0 && topOfBall <= bottomOfObject && bottomOfBall >= bottomOfBall) {
-            collisionTimeY = (bottomOfObject - topOfBall) / ball.speed.y;
+    // Check X collision
+    if (rightOfBall >= gameObjectLeft && leftOfBall <= gameObjectRight) {
+        if (ball.speed.y > 0 && bottomOfBall >= gameObjectTop && topOfBall <= gameObjectTop) {
+            collisionTimeY = (gameObjectTop - bottomOfBall) / ball.speed.y;
+        } else if (ball.speed.y < 0 && topOfBall <= gameObjectBottom && bottomOfBall >= gameObjectBottom) {
+            collisionTimeY = (gameObjectBottom - topOfBall) / ball.speed.y;
         }
     }
 
-    // check collision on y-axis
-    if (bottomOfBall >= topOfObject && topOfBall <= bottomOfObject) {
-        if (ball.speed.x > 0 && rightOfBall >= leftSideOfObject && leftOfBall <= leftSideOfObject) {
-            collisionTimeX = (leftSideOfObject - rightOfBall) / ball.speed.x;
-        } else if (ball.speed.x < 0 && leftOfBall <= rightSideOfObject && rightOfBall >= rightSideOfObject) {
-            collisionTimeX = (rightSideOfObject - leftOfBall) / ball.speed.x;
+    // Check Y collision
+    if (bottomOfBall >= gameObjectTop && topOfBall <= gameObjectBottom) {
+        if (ball.speed.x > 0 && rightOfBall >= gameObjectLeft && leftOfBall <= gameObjectLeft) {
+            collisionTimeX = (gameObjectLeft - rightOfBall) / ball.speed.x;
+        } else if (ball.speed.x < 0 && leftOfBall <= gameObjectRight && rightOfBall >= gameObjectRight) {
+            collisionTimeX = (gameObjectRight - leftOfBall) / ball.speed.x;
         }
     }
 
-    // determine the first collision
-    if (collisionTimeX != null && collisionTimeY != null) {
+    // Determine which collision happens first
+    if (collisionTimeX !== null && collisionTimeY !== null) {
         if (collisionTimeX < collisionTimeY) {
             ball.speed.x = -ball.speed.x;
             return true;
@@ -42,11 +42,11 @@ export function detectCollision(ball, gameObject, deltaTime) {
             ball.speed.y = -ball.speed.y;
             return true;
         }
-    } else if (collisionTimeX != null) {
+    } else if (collisionTimeX !== null) {
         ball.speed.x = -ball.speed.x;
         return true;
-    } else if (collisionTimeY != null) {
-        ball.spped.y = -ball.speed.y;
+    } else if (collisionTimeY !== null) {
+        ball.speed.y = -ball.speed.y;
         return true;
     }
 
