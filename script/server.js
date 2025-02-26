@@ -21,7 +21,7 @@ const server = createServer(async (req, res) => {
         res.writeHead(200, { 'Content-Type': contentType });
         res.end(data, 'utf-8');
     } catch {
-        res.writeHead(404);
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end('404 Not Found');
     }
 });
