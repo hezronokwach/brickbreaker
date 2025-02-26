@@ -1,5 +1,3 @@
-import SoundManager from './sounds.js';
-
 export default class Ball {
     constructor(game, startStuck = true) {
         this.game = game;
@@ -76,7 +74,6 @@ export default class Ball {
         // Bottom wall collision - remove ball
         if (this.position.y + this.size > this.game.gameheight) {
             this.element.remove();
-            SoundManager.playSound('gameOver');
             return false;
         }
 
