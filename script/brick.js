@@ -1,6 +1,6 @@
 import { detectCollision } from "./detectCollision.js";
 import PowerUp from "./powerup.js";
-
+import SoundManager from './sounds.js';
 
 export default class Brick {
     constructor(game, position, type = "normal") {
@@ -14,7 +14,7 @@ export default class Brick {
         this.element.className = 'brick';
         this.element.style.width = `${this.width}px`;
         this.element.style.height = `${this.height}px`;
-        this.game.gameContainer.appendChild(this.element); // Use this.game.gameContainer
+        this.game.brickContainer.appendChild(this.element); // Append to brick container
         this.type = type;
         this.element.classList.add(`brick-${type}`);
         if (type === 'multiball' || type === 'extralife') {
@@ -33,6 +33,9 @@ export default class Brick {
             const collidingBall = this.game.balls.find(ball => detectCollision(ball, this));
             collidingBall.speed.y = -collidingBall.speed.y;
             
+            // Play brick hit sound
+            SoundManager.playSound('brickHit');
+
             if (this.type !== 'normal') {
                 // Create power-up
                 const powerUp = new PowerUp(
@@ -44,6 +47,8 @@ export default class Brick {
                     this.type === 'multiball' ? 'multiball' : 'extralife'
                 );
                 this.game.powerUps.push(powerUp);
+                // Play power-up spawn sound
+                SoundManager.playSound('powerUp');
             }
 
             this.delete = true;

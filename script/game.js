@@ -2,14 +2,16 @@ import Paddle from './paddle.js';
 import InputHandler from './input.js';
 import Ball from './ball.js';
 import { level1, buildLevel,level2 } from './levels.js';
+import SoundManager from './sounds.js';
 
 export const GAMESTATE = {
-    PAUSE: 0,
-    PLAY: 1,
-    MENU: 2, // start menu
-    OVER: 3,
-    NEWLEVEL: 4,
-    WIN: 5
+    WELCOME: 0,  // New welcome screen state
+    PAUSE: 1,
+    PLAY: 2,
+    MENU: 3,
+    OVER: 4,
+    NEWLEVEL: 5,
+    WIN: 6
 };
 
 
@@ -46,7 +48,7 @@ export default class Game {
     constructor(gamewidth, gameheight) {
         this.gamewidth = gamewidth;
         this.gameheight = gameheight;
-        this.gamestate = GAMESTATE.MENU;
+        this.gamestate = GAMESTATE.WELCOME;  // Start with welcome screen
         
         // Frame timing
         this.lastTime = 0;
@@ -62,23 +64,51 @@ export default class Game {
         this.initializeDOM();
         this.createGameObjects();
         
+        // Create welcome screen
+        this.createWelcomeScreen();
+        
+        // Initialize sound manager
+        SoundManager.startMusic();
+        
         // Start game loop
         requestAnimationFrame(this.boundGameLoop);
+    }
+
+    createWelcomeScreen() {
+        if (this.activeWelcomeScreen) return;
+
+        const welcomeScreen = document.createElement('div');
+        welcomeScreen.className = 'welcome-screen';
+        welcomeScreen.style.cssText = overlayStyles;
+        
+        welcomeScreen.innerHTML = `
+            <h1 style="font-size: 2em; margin-bottom: 20px; color: #2A9D8F;">BRICK BREAKER</h1>
+            <div style="margin: 20px 0; color: #F1FAEE; font-size: 0.8em;">
+                <p style="margin: 10px 0;">Use ← → to move paddle</p>
+                <p style="margin: 10px 0;">Press ↑ to launch ball</p>
+                <p style="margin: 10px 0;">Press ESC to pause</p>
+            </div>
+            <button id="startGameButton" style="${buttonStyles}">
+                START GAME
+            </button>
+        `;
+        
+        this.gameContainer.appendChild(welcomeScreen);
+        this.activeWelcomeScreen = welcomeScreen;
+        
+        welcomeScreen.querySelector('#startGameButton').onclick = () => {
+            SoundManager.playSound('gameStart');
+            welcomeScreen.remove();
+            this.activeWelcomeScreen = null;
+            this.gamestate = GAMESTATE.MENU;
+            this.start();
+        };
     }
 
     gameLoop(timestamp) {
         // Calculate delta time
         const deltaTime = this.lastTime ? timestamp - this.lastTime : 0;
-        this.lastTime = timestamp;
-
-        // Track FPS
-        this.frameCount++;
-        if (timestamp - this.lastFPSUpdate > 1000) {
-            this.currentFPS = this.frameCount;
-            this.frameCount = 0;
-            this.lastFPSUpdate = timestamp;
-            console.log('FPS:', this.currentFPS);
-        }
+        this.lastTime = timestamp;        
 
         // Always render, regardless of state
         this.render();
@@ -103,6 +133,11 @@ export default class Game {
         if (!this.gameContainer) {
             throw new Error('Game container not found!');
         }
+
+        // Create a container for bricks
+        this.brickContainer = document.createElement('div');
+        this.brickContainer.className = 'brick-container';
+        this.gameContainer.appendChild(this.brickContainer);
     }
 
     createGameObjects() {
@@ -148,7 +183,13 @@ export default class Game {
         
         // Reset/build level
         this.bricks = buildLevel(this, this.levels[this.currentLevel]);
-        this.ball.reset();
+        
+        // Clear existing balls
+        this.balls.forEach(ball => ball.element && ball.element.remove());
+        
+        // Create new ball stuck to paddle for new level
+        this.ball = new Ball(this, true);
+        this.balls = [this.ball];
         
         // Update game objects array
         this.gameObjects = [this.ball, this.paddle];
@@ -186,7 +227,8 @@ export default class Game {
                 this.gamestate = GAMESTATE.OVER;
             } else {
                 // Create new ball only if player still has lives
-                this.ball = new Ball(this);
+                // Ball should be stuck when respawning after losing all balls
+                this.ball = new Ball(this, true);
                 this.balls = [this.ball];
             }
         }
@@ -227,7 +269,16 @@ export default class Game {
 
     updateScoreboard() {
         if (this.timerElement) {
-            this.timerElement.textContent = Math.floor(this.time);
+            let hours = Math.floor(this.time / 3600);
+            let minutes = Math.floor(this.time / 60) % 60;
+            let seconds = Math.floor(this.time) % 60;
+
+            let formattedTime = 
+            (hours > 0 ? hours.toString().padStart(2, '0') + ':' : '') +
+            minutes.toString().padStart(2, '0') + ':' +
+            seconds.toString().padStart(2, '0');
+
+            this.timerElement.textContent = formattedTime;
         }
         if (this.scoreElement) {
             this.scoreElement.textContent = this.score;
@@ -250,6 +301,12 @@ export default class Game {
     handleMenuState() {
         // Menu handling based on state
         switch(this.gamestate) {
+            case GAMESTATE.WELCOME:
+                if (!this.activeWelcomeScreen) {
+                    this.createWelcomeScreen();
+                }
+                break;
+
             case GAMESTATE.PAUSE:
                 if (!this.activePauseScreen) {
                     this.createPauseMenu();
@@ -417,6 +474,7 @@ createWinMenu() {
         // Create new game objects
         this.paddle = new Paddle(this);
         this.ball = new Ball(this);
+        this.ball.isStuck = true; // Ensure ball starts stuck
         this.balls = [this.ball];
         
         // Reset input handler
