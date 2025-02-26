@@ -3,7 +3,7 @@ import SoundManager from './sounds.js';
 export default class Ball {
     constructor(game, startStuck = true) {
         this.game = game;
-        this.size = 16;
+        this.size = 21;
         this.element = document.createElement('div');
         this.element.className = 'ball';
         this.element.style.width = `${this.size}px`;
