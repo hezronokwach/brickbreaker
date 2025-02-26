@@ -24,23 +24,14 @@ export function detectCollision(ball, gameObject, deltaTime) {
         }
     }
 
-    if (
-        bottomOfBall >= topOfObject &&
-        topOfBall <= bottomOfObject &&
-        ball.position.x + ball.size >= leftSideOfObject &&
-        ball.position.x <= rightSideOfObject
-    ) {
-        let ballComingFromTop = ball.speed.y > 0;
-        let ballComingFromBottom = ball.speed.y < 0;
-
-        if (ballComingFromTop && ballComingFromBottom <= bottomOfObject) {
-            ball.speed.y = -ball.speed.y;
-        } else if (ballComingFromBottom && topOfBall >= topOfObject) {
-            ball.speed.y = -ball.speed.y;
-        } else {
-            ball.speed.x = -ball.speed.x;
+    // check collision on y-axis
+    if (bottomOfBall >= topOfObject && topOfBall <= bottomOfObject) {
+        if (ball.speed.x > 0 && rightOfBall >= leftSideOfObject && leftOfBall <= leftSideOfObject) {
+            collisionTimeX = (leftSideOfObject - rightOfBall) / ball.speed.x;
+        } else if (ball.speed.x < 0 && leftOfBall <= rightSideOfObject && rightOfBall >= rightSideOfObject) {
+            collisionTimeX = (rightSideOfObject - leftOfBall) / ball.speed.x;
         }
-        return true;
     }
+    
     return false;
 }
