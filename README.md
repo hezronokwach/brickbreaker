@@ -10,7 +10,6 @@ This is a classic Arkanoid (Brick Breaker) game implemented using JavaScript, HT
 - **Multiple Levels:** The game includes multiple levels with varying brick layouts.
 - **Power-ups:** Special bricks spawn power-ups that enhance gameplay.
 - **Scoring System:** Points are awarded for breaking bricks, with a score displayed during gameplay.
-- **Sound Effects:** Sound effects enhance the gaming experience.
 - **Keyboard Controls:** Control the paddle using the left and right arrow keys.
 - **Sticky Ball:** The ball starts stuck to the paddle and is released with the up arrow key.
 - **Pause Functionality:** Press the ESC key to pause the game.
@@ -45,20 +44,14 @@ This is a classic Arkanoid (Brick Breaker) game implemented using JavaScript, HT
   - `script/input.js`: Handles keyboard input.
   - `script/levels.js`: Defines the levels and brick layouts.
   - `script/powerup.js`: Power-up logic and effects.
-  - `script/sounds.js`: Sound manager for loading and playing sound effects.
   - `script/detectCollision.js`: Collision detection logic.
 - `assets/`: Directory containing game assets.
   - `assets/ball3.png`: Image for the ball.
   - `assets/brick.jpg`: Image for the bricks.
-  - `assets/sounds/`: Directory containing sound effects.
 
 ## Dependencies
 
 - No external libraries or frameworks are required.
-
-## Sound Assets
-
-- Placeholder sound files are included in the `assets/sounds/` directory. Replace these with your own sound effects for a complete audio experience.
 
 ## Customization
 
