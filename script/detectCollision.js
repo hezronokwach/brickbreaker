@@ -32,6 +32,23 @@ export function detectCollision(ball, gameObject, deltaTime) {
             collisionTimeX = (rightSideOfObject - leftOfBall) / ball.speed.x;
         }
     }
-    
+
+    // determine the first collision
+    if (collisionTimeX != null && collisionTimeY != null) {
+        if (collisionTimeX < collisionTimeY) {
+            ball.speed.x = -ball.speed.x;
+            return true;
+        } else {
+            ball.speed.y = -ball.speed.y;
+            return true;
+        }
+    } else if (collisionTimeX != null) {
+        ball.speed.x = -ball.speed.x;
+        return true;
+    } else if (collisionTimeY != null) {
+        ball.spped.y = -ball.speed.y;
+        return true;
+    }
+
     return false;
 }
