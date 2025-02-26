@@ -16,6 +16,7 @@ export default class Brick {
         this.game.brickContainer.appendChild(this.element);
         this.type = type;
         this.element.classList.add(`brick-${type}`);
+
         if (type === 'multiball' || type === 'extralife') {
             this.points = 20;
         }
@@ -33,7 +34,6 @@ export default class Brick {
                     this.element.remove();
                     this.game.addScore(this.points);
 
-                    // apply powerups
                     if (this.type !== 'normal') {
                         const powerUp = new PowerUp(
                             this.game,
@@ -41,7 +41,7 @@ export default class Brick {
                                 x: this.position.x + this.width / 2,
                                 y: this.position.y
                             },
-                            this.typr === 'multiball' ? 'multiball' : 'extralife'
+                            this.type === 'multiball' ? 'multiball' : 'extralife'
                         );
                         this.game.powerUps.push(powerUp);
                     }
