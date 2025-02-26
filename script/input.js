@@ -5,7 +5,6 @@ export default class InputHandler {
         this.paddle = paddle;
         this.game = game;
         
-        // Store bound handlers to be able to remove them
         this.keyDownHandler = this.handleKeyDown.bind(this);
         this.keyUpHandler = this.handleKeyUp.bind(this);
         
@@ -13,11 +12,9 @@ export default class InputHandler {
     }
 
     initializeControls() {
-        // Remove existing listeners if any
         document.removeEventListener('keydown', this.keyDownHandler);
         document.removeEventListener('keyup', this.keyUpHandler);
         
-        // Add new listeners
         document.addEventListener('keydown', this.keyDownHandler);
         document.addEventListener('keyup', this.keyUpHandler);
     }
@@ -25,17 +22,16 @@ export default class InputHandler {
     handleKeyDown(event) {
         if (this.game.gamestate === GAMESTATE.PLAY) {
             switch(event.keyCode) {
-                case 37: // Left arrow
+                case 37:
                     event.preventDefault();
                     this.paddle.moveLeft();
                     break;
-                case 39: // Right arrow
+                case 39:
                     event.preventDefault();
                     this.paddle.moveRight();
                     break;
-                case 38: // Up arrow
+                case 38:
                     event.preventDefault();
-                    // Release any stuck balls
                     this.game.balls.forEach(ball => {
                         if (ball.isStuck) {
                             ball.release();

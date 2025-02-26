@@ -9,16 +9,16 @@ export default class Ball {
         this.element.style.width = `${this.size}px`;
         this.element.style.height = `${this.size}px`;
         this.game.gameContainer.appendChild(this.element);
-        this.isStuck = startStuck;  // Allow control of initial stuck state
-        this.initialSpeed = { x: 6, y: -4 }; // Set initial speed
+        this.isStuck = startStuck;
+        this.initialSpeed = { x: 6, y: -4 };
         this.reset();
     }
 
     reset() {
-        this.speed = { ...this.initialSpeed }; // Reset to initial speed
-        this.isStuck = true; // Reset to stuck state
-        this.updatePosition(); // Update initial position
-        this.draw(); // Draw immediately after reset
+        this.speed = { ...this.initialSpeed };
+        this.isStuck = true;
+        this.updatePosition();
+        this.draw();
     }
 
     updatePosition() {
@@ -38,10 +38,8 @@ export default class Ball {
 
     release() {
         if (this.isStuck) {
-            // Set initial speed
             this.speed = { ...this.initialSpeed };
             this.isStuck = false;
-            SoundManager.playSound('gameStart');
         }
     }
 
@@ -52,7 +50,7 @@ export default class Ball {
         }
 
         // Update speed calculations
-        const speedX = this.speed.x * (deltaTime / 16.67); // Normalize to 60fps
+        const speedX = this.speed.x * (deltaTime / 16.67);
         const speedY = this.speed.y * (deltaTime / 16.67);
 
         this.position.x += speedX;
@@ -62,29 +60,24 @@ export default class Ball {
         if (this.position.x + this.size > this.game.gamewidth || this.position.x < 0) {
             this.speed.x = -this.speed.x;
             this.position.x = Math.max(0, Math.min(this.position.x, this.game.gamewidth - this.size));
-            SoundManager.playSound('brickHit');
         }
         
         if (this.position.y < 0) {
             this.speed.y = -this.speed.y;
             this.position.y = 0;
-            SoundManager.playSound('brickHit');
         }
 
         // Paddle collision
         if (this.game.paddle.collidesWith(this)) {
-            // Ensure upward movement and maintain consistent speed
-            this.speed.y = -Math.abs(this.speed.y); // Ensure upward movement
-            this.position.y = this.game.paddle.position.y - this.size; // Prevent sticking
-            
-            //SoundManager.playSound('ballbounce');
+            this.speed.y = -Math.abs(this.speed.y);
+            this.position.y = this.game.paddle.position.y - this.size;
         }
 
         // Bottom wall collision - remove ball
         if (this.position.y + this.size > this.game.gameheight) {
-            this.element.remove(); // Remove DOM element
+            this.element.remove();
             SoundManager.playSound('gameOver');
-            return false; // Signal ball should be removed
+            return false;
         }
 
         this.draw();
