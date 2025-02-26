@@ -32,7 +32,21 @@ export default class Brick {
                     this.delete = true;
                     this.element.remove();
                     this.game.addScore(this.points);
+
+                    // apply powerups
+                    if (this.type !== 'normal') {
+                        const powerUp = new PowerUp(
+                            this.game,
+                            {
+                                x: this.position.x + this.width / 2,
+                                y: this.position.y
+                            },
+                            this.typr === 'multiball' ? 'multiball' : 'extralife'
+                        );
+                        this.game.powerUps.push(powerUp);
+                    }
                 }
+                break;
             }
         }
     }
