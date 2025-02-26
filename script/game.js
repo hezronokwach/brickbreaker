@@ -108,10 +108,7 @@ export default class Game {
     gameLoop(timestamp) {
         // Calculate delta time
         const deltaTime = this.lastTime ? timestamp - this.lastTime : 0;
-        this.lastTime = timestamp;
-
-        // Track FPS
-        
+        this.lastTime = timestamp;        
 
         // Always render, regardless of state
         this.render();
@@ -272,7 +269,16 @@ export default class Game {
 
     updateScoreboard() {
         if (this.timerElement) {
-            this.timerElement.textContent = Math.floor(this.time);
+            let hours = Math.floor(this.time / 3600);
+            let minutes = Math.floor(this.time / 60) % 60;
+            let seconds = Math.floor(this.time) % 60;
+
+            let formattedTime = 
+            (hours > 0 ? hours.toString().padStart(2, '0') + ':' : '') +
+            minutes.toString().padStart(2, '0') + ':' +
+            seconds.toString().padStart(2, '0');
+
+            this.timerElement.textContent = formattedTime;
         }
         if (this.scoreElement) {
             this.scoreElement.textContent = this.score;
