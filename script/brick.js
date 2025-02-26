@@ -1,6 +1,5 @@
 import { detectCollision } from "./detectCollision.js";
 import PowerUp from "./powerup.js";
-import SoundManager from './sounds.js';
 
 export default class Brick {
     constructor(game, position, type = "normal") {

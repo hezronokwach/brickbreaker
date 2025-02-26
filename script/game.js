@@ -2,7 +2,6 @@ import Paddle from './paddle.js';
 import InputHandler from './input.js';
 import Ball from './ball.js';
 import { level1, buildLevel,level2 } from './levels.js';
-import SoundManager from './sounds.js';
 
 export const GAMESTATE = {
     WELCOME: 0,
@@ -66,9 +65,6 @@ export default class Game {
         // Create welcome screen
         this.createWelcomeScreen();
         
-        // Initialize sound manager
-        SoundManager.startMusic();
-        
         // Start game loop
         requestAnimationFrame(this.boundGameLoop);
     }
@@ -96,7 +92,6 @@ export default class Game {
         this.activeWelcomeScreen = welcomeScreen;
         
         welcomeScreen.querySelector('#startGameButton').onclick = () => {
-            SoundManager.playSound('gameStart');
             welcomeScreen.remove();
             this.activeWelcomeScreen = null;
             this.gamestate = GAMESTATE.MENU;
