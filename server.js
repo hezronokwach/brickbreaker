@@ -5,19 +5,15 @@ import { extname, join } from 'path';
 const server = createServer(async (req, res) => {
     let filePath = '.' + req.url;
 
-    // Serve index.html when accessing root
     if (filePath === './' || filePath === './index') {
         filePath = './index.html';
     }
-    // Ensure JavaScript files are correctly served from /script/
     else if (filePath.endsWith('.js')) {
         filePath = join('.', req.url);
     }
-    // Serve CSS files correctly
     else if (filePath.endsWith('.css')) {
         filePath = join('.', req.url);
     }
-    // Serve images and assets correctly
     else if (filePath.startsWith('./assets/')) {
         filePath = join('.', req.url);
     }
@@ -25,14 +21,9 @@ const server = createServer(async (req, res) => {
     const ext = extname(filePath).toLowerCase();
     const contentType = {
         '.html': 'text/html',
-        '.js': 'text/javascript',  // ✅ Ensure JavaScript is served correctly
+        '.js': 'text/javascript',
         '.css': 'text/css',
-        '.png': 'image/png',
-        '.jpg': 'image/jpeg',
-        '.jpeg': 'image/jpeg',
-        '.gif': 'image/gif',
-        '.svg': 'image/svg+xml',
-        '.ico': 'image/x-icon'
+        '.png': 'image/png'
     }[ext] || 'application/octet-stream';
 
     try {
