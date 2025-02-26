@@ -5,7 +5,7 @@ import { level1, buildLevel,level2 } from './levels.js';
 import SoundManager from './sounds.js';
 
 export const GAMESTATE = {
-    WELCOME: 0,  // New welcome screen state
+    WELCOME: 0,
     PAUSE: 1,
     PLAY: 2,
     MENU: 3,
@@ -13,7 +13,6 @@ export const GAMESTATE = {
     NEWLEVEL: 5,
     WIN: 6
 };
-
 
 // Update overlayStyles to remove transitions
 const overlayStyles = `
@@ -48,7 +47,7 @@ export default class Game {
     constructor(gamewidth, gameheight) {
         this.gamewidth = gamewidth;
         this.gameheight = gameheight;
-        this.gamestate = GAMESTATE.WELCOME;  // Start with welcome screen
+        this.gamestate = GAMESTATE.WELCOME;
         
         // Frame timing
         this.lastTime = 0;
@@ -106,19 +105,15 @@ export default class Game {
     }
 
     gameLoop(timestamp) {
-        // Calculate delta time
         const deltaTime = this.lastTime ? timestamp - this.lastTime : 0;
         this.lastTime = timestamp;        
 
-        // Always render, regardless of state
         this.render();
 
-        // Only update game logic if not paused
         if (this.gamestate === GAMESTATE.PLAY) {
             this.update(deltaTime);
         }
 
-        // Continue the loop
         this.animationFrame = requestAnimationFrame(this.boundGameLoop);
     }
 
@@ -134,7 +129,6 @@ export default class Game {
             throw new Error('Game container not found!');
         }
 
-        // Create a container for bricks
         this.brickContainer = document.createElement('div');
         this.brickContainer.className = 'brick-container';
         this.gameContainer.appendChild(this.brickContainer);
@@ -145,28 +139,25 @@ export default class Game {
         this.lives = 2;
         this.score = 0;
         this.time = 0;
-        this.levels = [level1, level2]; // Add level2 to levels array
+        this.levels = [level1, level2];
         this.currentLevel = 0;
         
-        // Initialize empty arrays first
         this.gameObjects = [];
         this.bricks = [];
         
-        // Create paddle and ball
         this.paddle = new Paddle(this);
         this.ball = new Ball(this);
         
         this.inputHandler = new InputHandler(this.paddle, this);
         this.start();
 
-        this.activeGameOverScreen = null; // Track active screen
+        this.activeGameOverScreen = null;
 
         this.initializeKeyboardControls();
 
-        this.balls = [this.ball]; // Store all active balls
-        this.powerUps = []; // Store active power-ups
+        this.balls = [this.ball];
+        this.powerUps = [];
 
-        // Add FPS tracking
         this.frameCount = 0;
         this.lastFPSUpdate = 0;
         this.currentFPS = 0;
@@ -176,40 +167,30 @@ export default class Game {
         if (this.gamestate !== GAMESTATE.MENU && 
             this.gamestate !== GAMESTATE.NEWLEVEL) return;
 
-        // Clear existing bricks
         this.bricks.forEach(brick => {
             if (brick.element) brick.element.remove();
         });
         
-        // Reset/build level
         this.bricks = buildLevel(this, this.levels[this.currentLevel]);
         
-        // Clear existing balls
         this.balls.forEach(ball => ball.element && ball.element.remove());
         
-        // Create new ball stuck to paddle for new level
         this.ball = new Ball(this, true);
         this.balls = [this.ball];
         
-        // Update game objects array
         this.gameObjects = [this.ball, this.paddle];
         
-        // Change state to PLAY
         this.gamestate = GAMESTATE.PLAY;
         
-        // Update display
         this.updateScoreboard();
     }
     update(deltaTime) {
         if (this.gamestate !== GAMESTATE.PLAY) return;
     
-        // Cap deltaTime to ensure a maximum frame time of 16.67ms
         const cappedDeltaTime = Math.min(deltaTime, 16.67);
     
-        // Update paddle
         this.paddle.update(cappedDeltaTime);
     
-        // Update balls
         let ballsToRemove = [];
         this.balls.forEach(ball => {
             if (!ball.update(cappedDeltaTime)) {
@@ -217,32 +198,25 @@ export default class Game {
             }
         });
     
-        // Remove lost balls
         this.balls = this.balls.filter(ball => !ballsToRemove.includes(ball));
     
-        // Check if all balls are lost
         if (this.balls.length === 0) {
             this.lives--;
             if (this.lives <= 0) {
                 this.gamestate = GAMESTATE.OVER;
             } else {
-                // Create new ball only if player still has lives
-                // Ball should be stuck when respawning after losing all balls
                 this.ball = new Ball(this, true);
                 this.balls = [this.ball];
             }
         }
     
-        // Check for level completion
         if (this.bricks.length === 0) {
             this.currentLevel++;
             if (this.currentLevel >= this.levels.length) {
                 this.gamestate = GAMESTATE.WIN;
             } else {
                 this.gamestate = GAMESTATE.NEWLEVEL;
-                // Show level transition screen
                 this.showLevelTransition();
-                // Start next level after a delay
                 setTimeout(() => {
                     if (this.gamestate === GAMESTATE.NEWLEVEL) {
                         this.start();
@@ -251,7 +225,6 @@ export default class Game {
             }
         }
     
-        // Update bricks and powerups
         this.bricks.forEach(brick => brick.update(deltaTime));
         this.bricks = this.bricks.filter(brick => !brick.delete);
     
@@ -260,7 +233,6 @@ export default class Game {
             return !powerUp.delete;
         });
     
-        // Update timer and scoreboard
         this.time += deltaTime / 1000;
         this.updateScoreboard();
     }
@@ -289,7 +261,6 @@ export default class Game {
     }
 
     render() {
-        // Always render game objects
         this.paddle.draw();
         this.balls.forEach(ball => ball.draw());
         this.bricks.forEach(brick => brick.draw());
@@ -299,7 +270,6 @@ export default class Game {
     }
 
     handleMenuState() {
-        // Menu handling based on state
         switch(this.gamestate) {
             case GAMESTATE.WELCOME:
                 if (!this.activeWelcomeScreen) {
@@ -332,13 +302,12 @@ export default class Game {
         if (this.gamestate === GAMESTATE.PAUSE) {
             // Resume game
             this.gamestate = GAMESTATE.PLAY;
-            this.lastTime = performance.now(); // Reset time to prevent large delta
+            this.lastTime = performance.now();
             if (this.activePauseScreen) {
                 this.activePauseScreen.remove();
                 this.activePauseScreen = null;
             }
         } else {
-            // Pause game
             this.gamestate = GAMESTATE.PAUSE;
             this.createPauseMenu();
         }
@@ -351,7 +320,6 @@ createPauseMenu() {
     pauseScreen.className = 'pause-screen';
     pauseScreen.style.cssText = overlayStyles;
     
-    // Add frame counter element
     pauseScreen.innerHTML = `
         <h1 class="pulse" style="font-size: 2em; margin-bottom: 20px;">PAUSED</h1>
         <p style="margin: 15px 0;">Score: ${this.score}</p>
@@ -366,10 +334,8 @@ createPauseMenu() {
     this.gameContainer.appendChild(pauseScreen);
     this.activePauseScreen = pauseScreen;
 
-    // Store counter element reference
     this.pauseCounterElement = pauseScreen.querySelector('#pauseFrameCounter');
 
-    // Add button handlersf
     pauseScreen.querySelector('#pauseContinueButton').onclick = () => {
         this.gamestate = GAMESTATE.PLAY;
         pauseScreen.remove();
@@ -437,13 +403,11 @@ createWinMenu() {
     }
 
     clearGameObjects() {
-        // Remove all game elements from DOM
         this.balls.forEach(ball => ball.element && ball.element.remove());
         this.bricks.forEach(brick => brick.element && brick.element.remove());
         this.powerUps.forEach(powerUp => powerUp.element && powerUp.element.remove());
         this.paddle.element && this.paddle.element.remove();
 
-        // Clear arrays
         this.balls = [];
         this.bricks = [];
         this.powerUps = [];
@@ -451,7 +415,6 @@ createWinMenu() {
     }
 
     restart() {
-        // Clear all screens first
         if (this.activeGameOverScreen) {
             this.activeGameOverScreen.remove();
             this.activeGameOverScreen = null;
@@ -461,40 +424,33 @@ createWinMenu() {
             this.activePauseScreen = null;
         }
         
-        // Clear all game objects
         this.clearGameObjects();
         
-        // Reset game state
         this.lives = 2;
         this.score = 0;
         this.time = 0;
         this.currentLevel = 0;
         this.gamestate = GAMESTATE.MENU;
         
-        // Create new game objects
         this.paddle = new Paddle(this);
         this.ball = new Ball(this);
-        this.ball.isStuck = true; // Ensure ball starts stuck
+        this.ball.isStuck = true;
         this.balls = [this.ball];
         
-        // Reset input handler
         if (this.inputHandler) {
             this.inputHandler.destroy();
         }
         this.inputHandler = new InputHandler(this.paddle, this);
         
-        // Start fresh
         this.start();
         this.updateScoreboard();
     }
 
     initializeKeyboardControls() {
-        // Remove existing listener if any
         if (this.escKeyHandler) {
             document.removeEventListener('keydown', this.escKeyHandler);
         }
         
-        // Create new handler
         this.escKeyHandler = (event) => {
             if (event.key === "Escape" || event.keyCode === 27) {
                 event.preventDefault();
@@ -502,7 +458,6 @@ createWinMenu() {
             }
         };
         
-        // Add new listener
         document.addEventListener('keydown', this.escKeyHandler);
     }
 
