@@ -45,6 +45,7 @@ This is a classic Arkanoid (Brick Breaker) game implemented using JavaScript, HT
 ```bash
   node server.js
 ```
+- The server will start at ```http://localhost:3000```
 4. Play the game
 - Open your browser and navigate to ```http://localhost:3000```
 ## File Structure
