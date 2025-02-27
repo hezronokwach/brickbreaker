@@ -1,4 +1,3 @@
-import { detectCollision } from "./detectCollision.js";
 import Ball from "./ball.js";
 export default class PowerUp {
     constructor(game, position, type) {
@@ -6,7 +5,7 @@ export default class PowerUp {
         this.position = position;
         this.width = 30;
         this.height = 30;
-        this.speed = { x: 0, y: 2 }; // Falls downward
+        this.speed = { x: 0, y: 2 };
         this.type = type;
         this.delete = false;
         this.element = document.createElement('div');
@@ -72,15 +71,13 @@ export default class PowerUp {
         const currentBall = this.game.balls[0];
         if (!currentBall) return;
 
-        // Create two new balls with different angles
         for (let i = 0; i < 2; i++) {
-            const newBall = new Ball(this.game, false); // Create non-stuck balls for multiball
+            const newBall = new Ball(this.game, false);
             newBall.position = { 
                 x: currentBall.position.x,
                 y: currentBall.position.y 
             };
-            // Give different angles to the new balls and ensure they're not stuck
-            newBall.isStuck = false; // Multiball powerup creates free balls
+            newBall.isStuck = false;
             newBall.speed = {
                 x: currentBall.speed.x * (i === 0 ? -0.8 : 1.2),
                 y: currentBall.speed.y
