@@ -233,20 +233,26 @@ export default class Game {
         this.updateScoreboard();
     }
 
+    formatTime(time) {
+        if (typeof time !== 'number' || isNaN(time)) return '0s';
 
+        let hours = Math.floor(time / 3600);
+        let minutes = Math.floor(time / 60) % 60;
+        let seconds = Math.floor(time) % 60;
+
+        let formattedTime = [];
+
+        if (hours > 0) formattedTime.push(`${hours}h`);
+        if (minutes > 0) formattedTime.push(`${minutes}m`);
+        if (seconds > 0 || formattedTime.length === 0) formattedTime.push(`${seconds}s`);
+
+    
+        return formattedTime.join(' ');
+    }
 
     updateScoreboard() {
         if (this.timerElement) {
-            let hours = Math.floor(this.time / 3600);
-            let minutes = Math.floor(this.time / 60) % 60;
-            let seconds = Math.floor(this.time) % 60;
-
-            let formattedTime =
-                (hours > 0 ? hours.toString().padStart(2, '0') + ':' : '') +
-                minutes.toString().padStart(2, '0') + ':' +
-                seconds.toString().padStart(2, '0');
-
-            this.timerElement.textContent = formattedTime;
+            this.timerElement.textContent = this.formatTime(this.time);
         }
         if (this.scoreElement) {
             this.scoreElement.textContent = this.score;
@@ -353,7 +359,7 @@ export default class Game {
         gameOverScreen.innerHTML = `
         <h1 style="font-size: 2em; margin-bottom: 20px; color: #E63946;">GAME OVER</h1>
         <p style="margin: 15px 0; color: #F1FAEE;">Final Score: ${this.score}</p>
-        <p style="margin: 15px 0; color: #F1FAEE;">Time: ${Math.floor(this.time)}s</p>
+        <p style="margin: 15px 0; color: #F1FAEE;">Time: ${this.formatTime(this.time) }</p>
         <button id="restartButton" style="${buttonStyles}">
             PLAY AGAIN
         </button>
