@@ -18,9 +18,6 @@ const server = http.createServer(async (req, res) => {
     else if (filePath.endsWith('.css')) {
         filePath = path.join('.', req.url);
     }
-    else if (filePath.startsWith('./assets/')) {
-        filePath = path.join('.', req.url);
-    }
 
     const ext = path.extname(filePath).toLowerCase();
     const contentType = {
