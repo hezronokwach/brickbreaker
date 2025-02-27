@@ -1,24 +1,28 @@
-import { readFile } from 'fs/promises';
-import { createServer } from 'http';
-import { extname, join } from 'path';
+const fs = require('fs');
+const http = require('http');
+const path = require('path');
+const { promisify } = require('util');
 
-const server = createServer(async (req, res) => {
+// Promisify fs.readFile for async/await support
+const readFile = promisify(fs.readFile);
+
+const server = http.createServer(async (req, res) => {
     let filePath = '.' + req.url;
 
     if (filePath === './' || filePath === './index') {
         filePath = './index.html';
     }
     else if (filePath.endsWith('.js')) {
-        filePath = join('.', req.url);
+        filePath = path.join('.', req.url);
     }
     else if (filePath.endsWith('.css')) {
-        filePath = join('.', req.url);
+        filePath = path.join('.', req.url);
     }
     else if (filePath.startsWith('./assets/')) {
-        filePath = join('.', req.url);
+        filePath = path.join('.', req.url);
     }
 
-    const ext = extname(filePath).toLowerCase();
+    const ext = path.extname(filePath).toLowerCase();
     const contentType = {
         '.html': 'text/html',
         '.js': 'text/javascript',
