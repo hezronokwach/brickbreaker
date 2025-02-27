@@ -22,6 +22,7 @@ This is a classic Arkanoid (Brick Breaker) game implemented using JavaScript, HT
 - **ESC:** Pause the game.
 
 ## How to Play
+### Option 1: VS code live server
 
 1. Open `index.html` in your web browser.
 2. Click the "Start Game" button on the welcome screen.
@@ -31,6 +32,21 @@ This is a classic Arkanoid (Brick Breaker) game implemented using JavaScript, HT
 6. Avoid letting the ball fall below the paddle, or you will lose a life.
 7. If you lose all lives, the game is over.
 
+### Option 2: Run server
+
+1. Install node.js
+- If you don't have Node.js installed, download and install it from [nodejs.org](https://nodejs.org/en).
+2. Clone repository
+```bash
+  git clone https://github.com/your-repo/brickbreaker.git
+  cd brickbreaker
+```
+3. Run the server
+```bash
+  node server.js
+```
+4. Play the game
+- Open your browser and navigate to ```http://localhost:3000```
 ## File Structure
 
 - `index.html`: The main HTML file that sets up the game layout.
